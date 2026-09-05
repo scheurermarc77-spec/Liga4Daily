@@ -1,10 +1,10 @@
 {
   "report_date": "05.09.2026",
-  "title": "FC Eschenbach II führt die IFV-5.-Liga-Gruppe 4 an",
-  "lead": "FC Eschenbach II hat den Saisonstart in der 5. Liga, Gruppe 4, makellos gestaltet und steht nach drei Siegen aus drei Spielen mit neun Punkten an der Tabellenspitze. Der jüngste Erfolg beim FC Grosswangen-Ettiswil fiel mit 3:0 aus.",
-  "review": "In den vergangenen sieben Tagen gewann FC Eschenbach II zunächst am 30.08.2026 zuhause gegen FC Wauwil-Egolzwil mit 5:2. Am 04.09.2026 folgte auswärts beim FC Grosswangen-Ettiswil ein 3:0. Damit baute Eschenbach seine Saisonbilanz auf drei Siege, 14 erzielte und vier erhaltene Tore aus. Am 05.09.2026 wurden in der Gruppe zudem FC Wauwil-Egolzwil–FC Dagmersellen mit 1:7 und FC Knutwil II–SC Nebikon mit 1:1 abgeschlossen; FC Ruswil III–FC Schötz III war zum Stichtag noch angesetzt.",
-  "current_situation": "FC Eschenbach II führt die Tabelle mit neun Punkten vor FC Knutwil II mit sieben Punkten an. Der Vorsprung auf den zweitplatzierten Konkurrenten beträgt zwei Punkte, wobei Eschenbach bereits drei Partien absolviert hat. Besonders auffällig ist die offensive Ausbeute von 14 Toren; defensiv kassierte das Team vier Treffer. Die Form ist mit drei Siegen aus den drei Meisterschaftsspielen optimal. Die Tabelle bleibt allerdings früh in der Saison und teilweise durch unterschiedliche Spielanzahlen verzerrt. Torschützen des FC Eschenbach II konnten in den öffentlich zugänglichen, verifizierbaren Quellen zum Stichtag nicht belastbar ermittelt werden.",
-  "outlook": "Als nächstes trifft FC Eschenbach II am Samstag, 12.09.2026, um 19:00 Uhr zuhause auf FC Knutwil II. Es ist das direkte Spitzenspiel zwischen dem Tabellenführer und dem derzeit zweitplatzierten Team. Innerhalb der folgenden 14 Tage ist im offiziellen Spielplan zudem am Samstag, 26.09.2026, das Auswärtsspiel beim SC Nebikon aufgeführt; dieses liegt jedoch ausserhalb des 14-Tage-Zeitraums ab dem Stichtag 05.09.2026.",
+  "title": "FC Eschenbach II grüsst nach perfektem Start von der Spitze",
+  "lead": "Der FC Eschenbach II führt die 5. Liga, Gruppe 4, am Stichtag 5. September 2026 mit drei Siegen aus drei Spielen an. Nach dem 3:0 beim FC Grosswangen-Ettiswil weist Eschenbach neun Punkte und ein Torverhältnis von 14:4 auf.",
+  "review": "In den vergangenen sieben Tagen wurden in der Gruppe 4 zwei Partien ausgetragen. Der FC Hochdorf III setzte sich am 2. September mit 6:1 gegen den FC Ruswil III durch. Am 4. September gewann der FC Altbüron-Grossdietwil gegen Hochdorf III mit 3:2. Eschenbach II bestätigte am 4. September seine starke Frühform mit einem 3:0-Auswärtssieg beim FC Grosswangen-Ettiswil. Damit bleibt die Mannschaft nach drei Meisterschaftsspielen ohne Punktverlust. Der IFV führt für Eschenbach bisher die Resultate 6:2 gegen Altbüron-Grossdietwil, 5:2 gegen Wauwil-Egolzwil und 3:0 gegen Grosswangen-Ettiswil.",
+  "current_situation": "Eschenbach II steht mit neun Punkten an der Tabellenspitze. Dahinter folgen Knutwil II und Hochdorf III mit jeweils sechs Punkten. Besonders auffällig ist Hochdorfs Torverhältnis von 24:4, allerdings hat das Team bereits drei Partien absolviert. Knutwil II ist nach zwei Spielen noch ungeschlagen. Für Eschenbach spricht neben der optimalen Punkteausbeute die offensive Bilanz von 14 Treffern. In den öffentlich zugänglichen, geprüften Vereinsquellen wurde kein aktueller, eindeutig zuordenbarer Matchbericht mit zusätzlichen Angaben zu Eschenbachs Torschützen gefunden. Deshalb werden keine Torschützen ergänzt.",
+  "outlook": "Am 5. September stehen drei Partien auf dem Programm: Wauwil-Egolzwil empfängt Dagmersellen, Knutwil II spielt gegen Nebikon und Ruswil III trifft auf Schötz III. Eschenbach II bestreitet sein nächstes Spiel am Samstag, 12. September, um 19:00 Uhr zu Hause gegen Knutwil II. Danach folgt am 17. September Nebikon gegen Grosswangen-Ettiswil. Am 19. September spielt Dagmersellen gegen Altbüron-Grossdietwil. Das direkte Duell gegen Knutwil II ist für Eschenbach ein wichtiger Spitzenkampf: Knutwil hat bislang zwei Siege aus zwei Spielen erzielt.",
   "eschenbach": {
     "rank": 1,
     "played": 3,
@@ -19,22 +19,13 @@
   },
   "recent_results": [
     {
-      "date": "30.08.2026",
-      "time": "13:00",
-      "home": "FC Eschenbach II",
-      "away": "FC Wauwil-Egolzwil",
-      "home_goals": 5,
-      "away_goals": 2,
-      "note": "Meisterschaft, 5. Liga Gruppe 4"
-    },
-    {
-      "date": "04.09.2026",
+      "date": "02.09.2026",
       "time": "20:00",
-      "home": "FC Grosswangen-Ettiswil",
-      "away": "FC Eschenbach II",
-      "home_goals": 0,
-      "away_goals": 3,
-      "note": "Meisterschaft, 5. Liga Gruppe 4"
+      "home": "FC Hochdorf III",
+      "away": "FC Ruswil III",
+      "home_goals": 6,
+      "away_goals": 1,
+      "note": "Hochdorf III gewann deutlich. Spielnummer 117810."
     },
     {
       "date": "04.09.2026",
@@ -43,34 +34,16 @@
       "away": "FC Hochdorf III",
       "home_goals": 3,
       "away_goals": 2,
-      "note": "Weiteres Gruppenspiel"
+      "note": "Altbüron-Grossdietwil gewann nach einer 3:1-Pausenführung mit 3:2. Verifizierte Torschützen: Severin Willi, Samoel Nikaj und Lukas Lingg für Altbüron-Grossdietwil; Valentin Burri und Raul Piccinni für Hochdorf III."
     },
     {
-      "date": "05.09.2026",
-      "time": "",
-      "home": "FC Wauwil-Egolzwil",
-      "away": "FC Dagmersellen",
-      "home_goals": 1,
-      "away_goals": 7,
-      "note": "Weiteres Gruppenspiel"
-    },
-    {
-      "date": "05.09.2026",
-      "time": "",
-      "home": "FC Knutwil II",
-      "away": "SC Nebikon",
-      "home_goals": 1,
-      "away_goals": 1,
-      "note": "Weiteres Gruppenspiel"
-    },
-    {
-      "date": "05.09.2026",
+      "date": "04.09.2026",
       "time": "20:00",
-      "home": "FC Ruswil III",
-      "away": "FC Schötz III",
+      "home": "FC Grosswangen-Ettiswil",
+      "away": "FC Eschenbach II",
       "home_goals": 0,
-      "away_goals": 0,
-      "note": "Zum Stichtag als angesetzt geführt; Resultat nicht verifiziert publiziert"
+      "away_goals": 3,
+      "note": "Eschenbach II gewann auswärts mit 3:0. Spielnummer 117814."
     }
   ],
   "standings": [
@@ -85,21 +58,13 @@
     {
       "rank": 2,
       "team": "FC Knutwil II",
-      "played": 3,
-      "goal_difference": 6,
-      "points": 7,
-      "is_eschenbach": false
-    },
-    {
-      "rank": 3,
-      "team": "FC Dagmersellen",
       "played": 2,
-      "goal_difference": 7,
+      "goal_difference": 6,
       "points": 6,
       "is_eschenbach": false
     },
     {
-      "rank": 4,
+      "rank": 3,
       "team": "FC Hochdorf III",
       "played": 3,
       "goal_difference": 20,
@@ -107,7 +72,23 @@
       "is_eschenbach": false
     },
     {
+      "rank": 4,
+      "team": "FC Dagmersellen",
+      "played": 1,
+      "goal_difference": 1,
+      "points": 3,
+      "is_eschenbach": false
+    },
+    {
       "rank": 5,
+      "team": "FC Wauwil-Egolzwil",
+      "played": 2,
+      "goal_difference": 0,
+      "points": 3,
+      "is_eschenbach": false
+    },
+    {
+      "rank": 6,
       "team": "FC Altbüron-Grossdietwil",
       "played": 2,
       "goal_difference": -3,
@@ -115,19 +96,11 @@
       "is_eschenbach": false
     },
     {
-      "rank": 6,
-      "team": "FC Wauwil-Egolzwil",
-      "played": 3,
-      "goal_difference": -6,
-      "points": 3,
-      "is_eschenbach": false
-    },
-    {
       "rank": 7,
       "team": "SC Nebikon",
-      "played": 2,
+      "played": 1,
       "goal_difference": -3,
-      "points": 1,
+      "points": 0,
       "is_eschenbach": false
     },
     {
@@ -141,8 +114,8 @@
     {
       "rank": 9,
       "team": "FC Ruswil III",
-      "played": 2,
-      "goal_difference": -6,
+      "played": 3,
+      "goal_difference": -12,
       "points": 0,
       "is_eschenbach": false
     },
@@ -157,36 +130,116 @@
   ],
   "upcoming_matches": [
     {
+      "date": "05.09.2026",
+      "time": "18:00",
+      "home": "FC Wauwil-Egolzwil",
+      "away": "FC Dagmersellen",
+      "note": "Spielnummer 117813."
+    },
+    {
+      "date": "05.09.2026",
+      "time": "19:00",
+      "home": "FC Knutwil II",
+      "away": "SC Nebikon",
+      "note": "Spielnummer 117815."
+    },
+    {
+      "date": "05.09.2026",
+      "time": "20:00",
+      "home": "FC Ruswil III",
+      "away": "FC Schötz III",
+      "note": "Spielnummer 117811."
+    },
+    {
+      "date": "11.09.2026",
+      "time": "20:00",
+      "home": "FC Dagmersellen",
+      "away": "FC Grosswangen-Ettiswil",
+      "note": "Spielnummer 117818."
+    },
+    {
+      "date": "11.09.2026",
+      "time": "20:15",
+      "home": "FC Schötz III",
+      "away": "SC Nebikon",
+      "note": "Spielnummer 117816."
+    },
+    {
+      "date": "12.09.2026",
+      "time": "18:00",
+      "home": "FC Hochdorf III",
+      "away": "FC Wauwil-Egolzwil",
+      "note": "Spielnummer 117819."
+    },
+    {
       "date": "12.09.2026",
       "time": "19:00",
       "home": "FC Eschenbach II",
       "away": "FC Knutwil II",
-      "note": "Meisterschaft, 5. Liga Gruppe 4; Spitzenspiel zwischen Rang 1 und Rang 2"
+      "note": "Spitzenkampf und nächstes Spiel von Eschenbach II. Spielnummer 117817."
+    },
+    {
+      "date": "17.09.2026",
+      "time": "20:00",
+      "home": "SC Nebikon",
+      "away": "FC Grosswangen-Ettiswil",
+      "note": "Spielnummer 117807."
+    },
+    {
+      "date": "19.09.2026",
+      "time": "17:00",
+      "home": "FC Dagmersellen",
+      "away": "FC Altbüron-Grossdietwil",
+      "note": "Spielnummer 117809."
     }
   ],
   "scorers": [],
-  "scorer_note": "Im offiziellen IFV-Matchcenter und den geprüften öffentlich zugänglichen Quellen wurden zum Stichtag keine verifizierbaren Eschenbach-Torschützen publiziert.",
+  "scorer_note": "Für FC Eschenbach II wurde in den geprüften öffentlich zugänglichen Quellen kein verifizierter aktueller Torschützenbericht gefunden. Die im IFV-Matchcenter ersichtlichen Torschützen des Spiels Altbüron-Grossdietwil gegen Hochdorf III werden deshalb nicht als Eschenbach-Torschützen übernommen.",
   "sources": [
     {
-      "title": "IFV Matchcenter: FC Eschenbach II, Resultate und Rangliste 5. Liga Gruppe 4",
-      "url": "https://dev-matchcenter.ifv.ch/default.aspx?a=trr&lng=1&oid=7&t=67765&v=352"
+      "title": "IFV Matchcenter – 5. Liga, Gruppe 4: Tabelle und Resultate",
+      "url": "https://matchcenter.ifv.ch/Default.aspx?a=rr&lng=1&oid=7&v=352"
     },
     {
-      "title": "IFV Matchcenter: Spielplan FC Eschenbach II, Saison 2026/27",
-      "url": "https://dev-matchcenter.ifv.ch/default.aspx?a=pt&lng=1&ls=25897&oid=7&sg=67609&t=30928&v=352"
+      "title": "IFV Matchcenter – Spielplan und kommende Partien der Gruppe 4",
+      "url": "https://matchcenter.ifv.ch/default.aspx?a=mna&ln=13040&lng=1&ls=25897&oid=7&s=2027&sg=70471"
     },
     {
-      "title": "IFV Matchcenter: Vereinsspielplan FC Eschenbach",
-      "url": "https://dev-matchcenter.ifv.ch/Default.aspx?a=hs&lng=1&oid=7&v=352"
+      "title": "IFV Matchcenter – FC Grosswangen-Ettiswil gegen FC Eschenbach II, 0:3",
+      "url": "https://dev-matchcenter.ifv.ch/default.aspx?lng=1&oid=7&v=352"
     },
     {
-      "title": "IFV Matchcenter: Gruppeneinteilung 5. Liga, Gruppe 4",
-      "url": "https://matchcenter.ifv.ch/default.aspx?a=mgr&ln=13040&lng=1&ls=25897&oid=7&s=2027&sg=0"
+      "title": "IFV Matchcenter – FC Hochdorf III gegen FC Ruswil III, 6:1",
+      "url": "https://matchcenter.el-pl.ch/Default.aspx?ln=&lng=1&oid=3&tg=4328763&v=376"
     },
     {
-      "title": "Offizielle Vereinsseite FC Eschenbach",
-      "url": "http://fceschenbach.ch"
+      "title": "IFV Matchcenter – FC Altbüron-Grossdietwil gegen FC Hochdorf III, 3:2",
+      "url": "https://matchcenter.ifv.ch/Default.aspx?ln=&lng=1&oid=7&tg=4328765&v=352"
+    },
+    {
+      "title": "FC Eschenbach – offizielle Vereinswebsite",
+      "url": "https://fceschenbach.ch"
+    },
+    {
+      "title": "FC Grosswangen-Ettiswil – offizielle Vereinswebsite",
+      "url": "https://www.fcge.ch"
+    },
+    {
+      "title": "FC Hochdorf – offizielle Vereinswebsite",
+      "url": "https://www.fchochdorf.ch"
+    },
+    {
+      "title": "FC Ruswil – offizielle Vereinswebsite",
+      "url": "https://www.fcruswil.ch"
+    },
+    {
+      "title": "FC Wauwil-Egolzwil – offizielle Vereinswebsite",
+      "url": "https://www.fcwauwil-egolzwil.ch"
+    },
+    {
+      "title": "FC Dagmersellen – offizielle Vereinswebsite",
+      "url": "https://fcdagmersellen.ch"
     }
   ],
-  "generated_at": "05.09.2026 20:58"
+  "generated_at": "05.09.2026 21:17"
 }
