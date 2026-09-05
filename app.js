@@ -11,4 +11,15 @@ ${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${d.s
 <section class="card"><h2>Quellen</h2>${(d.sources||[]).map(s=>`<a class="source" target="_blank" rel="noopener" href="${esc(s.url)}">${esc(s.title||s.url)} ↗</a>`).join('')}</section>
 <div class="updated">Stand: ${esc(d.report_date)} · aktualisiert ${esc(d.generated_at||'')}</div>`}
 fetch('data/report.json?'+Date.now()).then(r=>{if(!r.ok)throw Error();return r.json()}).then(render).catch(()=>app.innerHTML='<section class="status-card">Der Tagesbericht konnte gerade nicht geladen werden.</section>');
+
+const logoButton=document.getElementById('logoButton');
+const logoModal=document.getElementById('logoModal');
+const logoClose=document.getElementById('logoClose');
+function openLogo(){if(!logoModal)return;logoModal.hidden=false;logoModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');logoClose?.focus();}
+function closeLogo(){if(!logoModal)return;logoModal.hidden=true;logoModal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');logoButton?.focus();}
+logoButton?.addEventListener('click',openLogo);
+logoClose?.addEventListener('click',closeLogo);
+logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
+
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
