@@ -15,7 +15,7 @@ prompt=f'''Du bist Sportredaktor für den Schweizer Amateurfussball. Recherchier
 Stichtag: {date_display} (Europe/Zurich).
 Primärquelle: offizieller IFV Matchcenter. Offizielle Vereinsseite FC Eschenbach und öffentlich zugängliche Matchberichte dürfen ergänzend verwendet werden.
 
-Erstelle einen täglichen Bericht mit:
+Erstelle einen aktuellen Bericht mit:
 - Rückblick auf relevante Spiele/Entwicklungen der letzten 7 Tage
 - aktuelle Situation: vollständige Gruppentabelle, Form und Einordnung
 - Ausblick auf die kommenden 14 Tage
@@ -45,7 +45,7 @@ Antworte ausschliesslich als valides JSON in exakt dieser Struktur:
 payload={
     'model':'gpt-5.6-luna',
     'tools':[{'type':'web_search'}],
-    'reasoning':{'effort':'medium'},
+    'reasoning':{'effort':'low'},
     'input':prompt
 }
 req=urllib.request.Request(
@@ -79,4 +79,4 @@ os.makedirs('data',exist_ok=True)
 with open('data/report.json','w',encoding='utf-8') as f:
     json.dump(data,f,ensure_ascii=False,indent=2)
     f.write('\n')
-print('Tagesbericht aktualisiert:', date_display)
+print('Bericht aktualisiert:', date_display)
