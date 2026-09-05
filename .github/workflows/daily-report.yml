@@ -1,8 +1,6 @@
-name: Daily Liga 4 Report
+name: Liga 4 Bericht aktualisieren
 
 on:
-  schedule:
-    - cron: '30 5 * * *'
   workflow_dispatch:
 
 permissions:
@@ -20,7 +18,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/update_report.py
-      - name: Bericht committen
+      - name: Bericht speichern
         run: |
           if git diff --quiet -- data/report.json; then
             echo "Keine Änderung am Bericht."
@@ -29,5 +27,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/report.json
-          git commit -m "Tagesbericht automatisch aktualisieren"
+          git commit -m "Liga-4-Bericht manuell aktualisiert"
           git push
