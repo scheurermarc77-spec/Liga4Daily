@@ -1,0 +1,39 @@
+name: Rebuild Liga4Daily ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "zip_parts/**"
+      - ".github/workflows/rebuild-zip.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild and verify ZIP
+        shell: bash
+        run: |
+          cat zip_parts/part_*.txt > Liga4Daily_v3.b64
+          base64 --decode Liga4Daily_v3.b64 > Liga4Daily_v3_FIXED.zip
+          unzip -t Liga4Daily_v3_FIXED.zip
+          test "$(stat -c%s Liga4Daily_v3_FIXED.zip)" -eq 44534
+
+      - name: Commit verified ZIP
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Liga4Daily_v3_FIXED.zip
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "Build verified Liga4Daily v3 ZIP"
+          git push
