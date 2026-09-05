@@ -14,22 +14,15 @@
 </head>
 <body>
   <header class="hero">
-    <img class="brand-logo" src="logo-eschenbach-ii.svg" alt="FC Eschenbach II">
+    <button id="logoButton" class="brand-button" type="button" aria-label="Logo von FC Eschenbach II vergrössern">
+      <img class="brand-logo" src="logo-eschenbach-ii.svg" alt="FC Eschenbach II">
+    </button>
     <div>
       <div class="eyebrow">IFV · 5. Liga · Gruppe 4</div>
       <h1>Liga 4 Daily</h1>
       <p>Der aktuelle Überblick mit Fokus auf FC Eschenbach II</p>
     </div>
   </header>
-
-  <section class="team-hero" aria-label="FC Eschenbach II Mannschaft">
-    <img class="team-photo" src="https://fceschenbach.ch/images/mannschaftsbilder/Saison%2026-27/Zwoii-2026.jpg" alt="Offizielles Mannschaftsbild FC Eschenbach II, Saison 2026/27" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="team-fallback" style="display:none">Mannschaftsbild momentan nicht verfügbar.</div>
-    <div class="team-caption">
-      <div><strong>FC Eschenbach II</strong><span>2. Mannschaft · Saison 2026/27</span></div>
-      <a href="https://fceschenbach.ch/aktive/2-mannschaft" target="_blank" rel="noopener">Offizielle Teamseite ↗</a>
-    </div>
-  </section>
 
   <div class="adminbar">
     <a class="update-button" href="https://github.com/scheurermarc77-spec/Liga4Daily/actions/workflows/daily-report.yml" target="_blank" rel="noopener">↻ Neue Recherche starten</a>
@@ -43,6 +36,11 @@
   <footer>
     <p>Primärquelle: IFV Matchcenter. Ergänzend öffentlich zugängliche Vereins- und Matchberichte.</p>
   </footer>
+
+  <div id="logoModal" class="image-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Logo FC Eschenbach II">
+    <button id="logoClose" class="image-modal-close" type="button" aria-label="Vergrösserte Ansicht schliessen">×</button>
+    <img class="image-modal-img" src="logo-eschenbach-ii.svg" alt="FC Eschenbach II">
+  </div>
 
   <script src="app.js" defer></script>
 </body>
