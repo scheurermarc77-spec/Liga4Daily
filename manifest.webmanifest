@@ -8,9 +8,9 @@
   "description":"Aktueller Überblick zur IFV 5. Liga Gruppe 4 mit Fokus auf FC Eschenbach II.",
   "icons":[
     {
-      "src":"logo-eschenbach-ii.svg",
-      "sizes":"any",
-      "type":"image/svg+xml",
+      "src":"app-icon-180.png?v=2",
+      "sizes":"180x180",
+      "type":"image/png",
       "purpose":"any"
     }
   ]
