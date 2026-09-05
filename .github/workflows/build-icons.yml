@@ -1,4 +1,5 @@
 name: Build app icons
+# rebuild: v2
 
 on:
   workflow_dispatch:
