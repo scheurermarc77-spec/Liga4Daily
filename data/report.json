@@ -1,0 +1,37 @@
+{
+  "report_date":"05.09.2026",
+  "generated_at":"Demo-Stand",
+  "title":"Eschenbach II startet makellos",
+  "lead":"Drei Meisterschaftsspiele, drei Siege: Eschenbach II führt die Gruppe mit 9 Punkten und 14:4 Toren an.",
+  "review":"Der jüngste Auftritt endete mit einem 3:0-Auswärtssieg beim FC Grosswangen-Ettiswil. Zuvor gewann Eschenbach II zuhause gegen Wauwil-Egolzwil 5:2 und zum Saisonauftakt 6:2 bei Altbüron-Grossdietwil.",
+  "current_situation":"Eschenbach II steht an der Tabellenspitze. Die Offensive produziert konstant, gleichzeitig blieb das Team im jüngsten Meisterschaftsspiel ohne Gegentor.",
+  "outlook":"Als Nächstes wartet das Heimspiel gegen Knutwil II. Das Duell dürfte ein wichtiger Gradmesser im Kampf um die Spitze werden.",
+  "eschenbach":{"rank":1,"played":3,"wins":3,"draws":0,"losses":0,"goals_for":14,"goals_against":4,"goal_difference":10,"points":9,"form":"S · S · S"},
+  "recent_results":[
+    {"date":"04.09.2026","home":"FC Grosswangen-Ettiswil","away":"FC Eschenbach II","home_goals":0,"away_goals":3,"note":"3. Meisterschaftssieg in Serie"},
+    {"date":"30.08.2026","home":"FC Eschenbach II","away":"FC Wauwil-Egolzwil","home_goals":5,"away_goals":2,"note":"Heimsieg"},
+    {"date":"22.08.2026","home":"FC Altbüron-Grossdietwil","away":"FC Eschenbach II","home_goals":2,"away_goals":6,"note":"Saisonauftakt"}
+  ],
+  "standings":[
+    {"rank":1,"team":"FC Eschenbach II","played":3,"goal_difference":10,"points":9,"is_eschenbach":true},
+    {"rank":2,"team":"FC Knutwil II","played":2,"goal_difference":6,"points":6,"is_eschenbach":false},
+    {"rank":3,"team":"FC Hochdorf III","played":3,"goal_difference":20,"points":6,"is_eschenbach":false},
+    {"rank":4,"team":"FC Dagmersellen","played":1,"goal_difference":1,"points":3,"is_eschenbach":false},
+    {"rank":5,"team":"FC Wauwil-Egolzwil","played":2,"goal_difference":0,"points":3,"is_eschenbach":false},
+    {"rank":6,"team":"FC Altbüron-Grossdietwil","played":2,"goal_difference":-3,"points":3,"is_eschenbach":false},
+    {"rank":7,"team":"SC Nebikon","played":1,"goal_difference":-3,"points":0,"is_eschenbach":false},
+    {"rank":8,"team":"FC Grosswangen-Ettiswil","played":2,"goal_difference":-6,"points":0,"is_eschenbach":false},
+    {"rank":9,"team":"FC Ruswil III","played":2,"goal_difference":-6,"points":0,"is_eschenbach":false},
+    {"rank":10,"team":"FC Schötz III","played":2,"goal_difference":-19,"points":0,"is_eschenbach":false}
+  ],
+  "upcoming_matches":[
+    {"date":"12.09.2026","time":"19:00","home":"FC Eschenbach II","away":"FC Knutwil II","note":"Direktes Duell an der Spitze"},
+    {"date":"26.09.2026","time":"17:00","home":"SC Nebikon","away":"FC Eschenbach II","note":"Auswärtsspiel"}
+  ],
+  "scorers":[],
+  "scorer_note":"Torschützen werden nur angezeigt, wenn sie verifiziert publiziert sind.",
+  "sources":[
+    {"title":"IFV Matchcenter – FC Eschenbach","url":"https://matchcenter.ifv.ch/default.aspx?lng=1&oid=7&v=352"},
+    {"title":"FC Eschenbach","url":"https://fceschenbach.ch/"}
+  ]
+}
