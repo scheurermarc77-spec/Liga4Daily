@@ -1,0 +1,42 @@
+name: Build app icons
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'logo-eschenbach-ii.svg'
+      - '.github/workflows/build-icons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create PNG icons from exact in-app logo
+        run: |
+          python -m pip install --quiet cairosvg pillow
+          python - <<'PY'
+          import cairosvg
+          from PIL import Image
+          from pathlib import Path
+          cairosvg.svg2png(url='logo-eschenbach-ii.svg', write_to='icon-source.png', output_width=1024, output_height=1024)
+          src = Image.open('icon-source.png').convert('RGB')
+          for size, name in [(180,'app-icon-180.png'),(192,'app-icon-192.png'),(512,'app-icon-512.png')]:
+              src.resize((size,size), Image.Resampling.LANCZOS).save(name,'PNG',optimize=True)
+          Path('icon-source.png').unlink()
+          PY
+      - name: Commit icons
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app-icon-180.png app-icon-192.png app-icon-512.png
+          git diff --cached --quiet && exit 0
+          git commit -m 'Build exact iPhone and PWA icons'
+          git push
