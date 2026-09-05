@@ -28,15 +28,17 @@ jobs:
           from pathlib import Path
           cairosvg.svg2png(url='logo-eschenbach-ii.svg', write_to='icon-source.png', output_width=1024, output_height=1024)
           src = Image.open('icon-source.png').convert('RGB')
-          for size, name in [(180,'app-icon-180.png'),(192,'app-icon-192.png'),(512,'app-icon-512.png')]:
-              src.resize((size,size), Image.Resampling.LANCZOS).save(name,'PNG',optimize=True)
+          src.resize((180,180), Image.Resampling.LANCZOS).save('app-icon-180.png','PNG',optimize=True)
+          src.resize((180,180), Image.Resampling.LANCZOS).save('apple-touch-icon.png','PNG',optimize=True)
+          src.resize((192,192), Image.Resampling.LANCZOS).save('app-icon-192.png','PNG',optimize=True)
+          src.resize((512,512), Image.Resampling.LANCZOS).save('app-icon-512.png','PNG',optimize=True)
           Path('icon-source.png').unlink()
           PY
       - name: Commit icons
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add app-icon-180.png app-icon-192.png app-icon-512.png
+          git add apple-touch-icon.png app-icon-180.png app-icon-192.png app-icon-512.png
           git diff --cached --quiet && exit 0
           git commit -m 'Build exact iPhone and PWA icons'
           git push
