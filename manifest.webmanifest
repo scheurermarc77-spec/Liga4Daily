@@ -1,9 +1,17 @@
 {
   "name":"Liga 4 Daily – FC Eschenbach II",
-  "short_name":"Liga 4 Daily",
+  "short_name":"Eschenbach II",
   "start_url":"./",
   "display":"standalone",
   "background_color":"#f2f3f5",
   "theme_color":"#f4c400",
-  "description":"Täglicher Überblick zur IFV 5. Liga Gruppe 4 mit Fokus auf FC Eschenbach II."
+  "description":"Aktueller Überblick zur IFV 5. Liga Gruppe 4 mit Fokus auf FC Eschenbach II.",
+  "icons":[
+    {
+      "src":"logo-eschenbach-ii.svg",
+      "sizes":"any",
+      "type":"image/svg+xml",
+      "purpose":"any maskable"
+    }
+  ]
 }
