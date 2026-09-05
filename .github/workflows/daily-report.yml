@@ -1,0 +1,33 @@
+name: Daily Liga 4 Report
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recherche und Bericht
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/update_report.py
+      - name: Bericht committen
+        run: |
+          if git diff --quiet -- data/report.json; then
+            echo "Keine Änderung am Bericht."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/report.json
+          git commit -m "Tagesbericht automatisch aktualisieren"
+          git push
