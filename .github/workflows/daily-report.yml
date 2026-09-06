@@ -2,23 +2,52 @@ name: Liga 4 Bericht aktualisieren
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
+
+concurrency:
+  group: go-eschenbach-report-update
+  cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Prüfen ob ein Update angefordert ist
+        id: request
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+            echo "request_id=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          STATUS=$(curl -sS --max-time 15 "https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request?worker=1" || echo '{"pending":false}')
+          PENDING=$(echo "$STATUS" | jq -r '.pending // false' 2>/dev/null || echo false)
+          REQUEST_ID=$(echo "$STATUS" | jq -r '.request_id // empty' 2>/dev/null || true)
+          echo "pending=$PENDING" >> "$GITHUB_OUTPUT"
+          echo "request_id=$REQUEST_ID" >> "$GITHUB_OUTPUT"
+          echo "Update angefordert: $PENDING"
+
       - uses: actions/checkout@v4
+        if: steps.request.outputs.pending == 'true'
+
       - uses: actions/setup-python@v5
+        if: steps.request.outputs.pending == 'true'
         with:
           python-version: '3.12'
+
       - name: Recherche und Bericht
+        if: steps.request.outputs.pending == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/update_report.py
+
       - name: Bericht speichern
+        if: steps.request.outputs.pending == 'true'
         run: |
           if git diff --quiet -- data/report.json; then
             echo "Keine Änderung am Bericht."
@@ -27,5 +56,27 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/report.json
-          git commit -m "Liga-4-Bericht manuell aktualisiert"
+          git commit -m "Liga-4-Bericht aus der App aktualisiert"
           git push
+
+      - name: App-Update als abgeschlossen markieren
+        if: success() && github.event_name == 'schedule' && steps.request.outputs.pending == 'true' && steps.request.outputs.request_id != ''
+        env:
+          REQUEST_ID: ${{ steps.request.outputs.request_id }}
+        run: |
+          curl -fsS -X POST \
+            -H 'Content-Type: application/json' \
+            -H 'X-Go-Eschenbach-Worker: report-v1' \
+            --data "{\"action\":\"complete\",\"request_id\":\"$REQUEST_ID\",\"message\":\"Bericht aktualisiert\"}" \
+            "https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request"
+
+      - name: Fehlgeschlagenes App-Update melden
+        if: failure() && github.event_name == 'schedule' && steps.request.outputs.pending == 'true' && steps.request.outputs.request_id != ''
+        env:
+          REQUEST_ID: ${{ steps.request.outputs.request_id }}
+        run: |
+          curl -sS -X POST \
+            -H 'Content-Type: application/json' \
+            -H 'X-Go-Eschenbach-Worker: report-v1' \
+            --data "{\"action\":\"fail\",\"request_id\":\"$REQUEST_ID\",\"message\":\"Aktualisierung fehlgeschlagen\"}" \
+            "https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request" || true
