@@ -32,18 +32,20 @@ function render(d){
   const e=d.eschenbach||{};
   const fresh=freshnessInfo(d.generated_at);
   app.innerHTML=`
-<section class="update-sticker ${fresh.tone}" aria-label="Aktualisiert am ${fresh.date} ${fresh.time}">
-  <span class="update-sticker-icon" aria-hidden="true">↻</span>
-  <div class="update-sticker-copy"><span>AKTUALISIERT AM</span><strong>${fresh.date}</strong>${fresh.time?`<small>${fresh.time}</small>`:''}</div>
-</section>
 <section class="team-photo-inline" id="teamPhotoCard">
   <img src="team-photo.jpg?v=3" alt="Mannschaft FC Eschenbach II" loading="eager" onerror="document.getElementById('teamPhotoCard').style.display='none'">
 </section>
-<section class="card"><span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(d.lead)}</p></section>
+<section class="card report-card">
+  <div class="update-sticker ${fresh.tone}" aria-label="Aktualisiert am ${fresh.date} ${fresh.time}">
+    <span class="update-sticker-icon" aria-hidden="true">↻</span>
+    <div class="update-sticker-copy"><span>AKTUALISIERT AM</span><strong>${fresh.date}</strong>${fresh.time?`<small>${fresh.time}</small>`:''}</div>
+  </div>
+  <span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(d.lead)}</p>
+</section>
 <section class="grid"><div class="stat"><strong>${esc(e.rank?`#${e.rank}`:'–')}</strong><span>Rang</span></div><div class="stat"><strong>${val(e.points)}</strong><span>Punkte</span></div><div class="stat"><strong>${val(e.wins)}</strong><span>Siege</span></div></section>
 <section class="card"><h2>Rückblick</h2><p>${esc(d.review)}</p>${(d.recent_results||[]).map(matchHTML).join('')}</section>
 <section class="card standings-card"><h2>Aktuelle Situation</h2><p>${esc(d.current_situation)}</p><div class="table-wrap"><table class="standings"><thead><tr><th>#</th><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Str</th><th>Tore</th><th>TD</th><th>Pkt</th></tr></thead><tbody>${(d.standings||[]).map(raw=>{const r=fullRow(raw);return`<tr class="${r.is_eschenbach?'fce':''}"><td>${val(r.rank)}</td><td>${esc(r.team)}</td><td>${val(r.played)}</td><td>${val(r.wins)}</td><td>${val(r.draws)}</td><td>${val(r.losses)}</td><td>${val(r.penalty_points)}</td><td>${r.goals_for!=null&&r.goals_against!=null?`${r.goals_for}:${r.goals_against}`:'–'}</td><td>${r.goal_difference!=null?`${r.goal_difference>0?'+':''}${r.goal_difference}`:'–'}</td><td><strong>${val(r.points)}</strong></td></tr>`}).join('')}</tbody></table></div><div class="table-legend">Sp = Spiele · S = Siege · U = Unentschieden · N = Niederlagen · Str = Strafpunkte · TD = Tordifferenz</div></section>
-<section class="card"><h2>Ausblick</h2><p>${esc(d.outlook)}</p>${(d.upcoming_matches||[]).map(matchHTML).join('')}</section>
+<section class="card"><h2>Ausblick</h2><p>${esc(d.outlook)}</p><h3 class="section-subtitle">Kommende Spiele</h3>${(d.upcoming_matches||[]).map(matchHTML).join('')}</section>
 ${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${d.scorers.map(s=>`<div class="match"><strong>${esc(s.name)}</strong> · ${esc(s.goals)} Tore</div>`).join('')}<div class="muted">${esc(d.scorer_note||'')}</div></section>`:''}`;
 }
 
@@ -60,4 +62,4 @@ logoButton?.addEventListener('click',openLogo);
 logoClose?.addEventListener('click',closeLogo);
 logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=12').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=13').catch(()=>{})}
