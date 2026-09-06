@@ -35,7 +35,7 @@
     setStatus('Bericht wird veröffentlicht …','publishing');
     const started=Date.now();
     while(Date.now()-started<120000){
-      await new Promise(r=>setTimeout(r,7000));
+      await new Promise(r=>setTimeout(r,5000));
       const current=await getReportVersion();
       if(current && current!==beforeGeneratedAt){
         setStatus('Aktualisiert ✓','done');
@@ -56,8 +56,9 @@
       if(!r.ok)throw Error();
       const d=await r.json();
       if(d.pending){
-        setStatus('Aktualisierung läuft …','running');
-        pollTimer=setTimeout(poll,12000);
+        if(d.phase==='running')setStatus('Aktualisierung läuft …','running');
+        else setStatus('Update startet …','running');
+        pollTimer=setTimeout(poll,7000);
         return;
       }
 
@@ -74,10 +75,35 @@
         await waitForPublishedReport();
         return;
       }
-      pollTimer=setTimeout(poll,12000);
+      pollTimer=setTimeout(poll,7000);
     }catch{
       setStatus('Verbindung wird erneut geprüft …','running');
-      pollTimer=setTimeout(poll,15000);
+      pollTimer=setTimeout(poll,10000);
+    }
+  };
+
+  const setupGitHub=async()=>{
+    const token=window.prompt('Einmalige Einrichtung: Füge deinen GitHub Fine-grained Token ein. Er wird nicht auf dem iPhone gespeichert.');
+    if(!token)return false;
+    const code=window.prompt('Gib den einmaligen Setup-Code ein:');
+    if(!code)return false;
+    setStatus('GitHub wird verbunden …','running');
+    try{
+      const r=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'setup',github_token:token.trim(),setup_code:code.trim()})
+      });
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.configured){
+        setStatus(d.error==='wrong_setup_code'?'Setup-Code stimmt nicht.':'GitHub-Verbindung konnte nicht eingerichtet werden.','error');
+        return false;
+      }
+      setStatus('GitHub verbunden ✓','done');
+      return true;
+    }catch{
+      setStatus('GitHub-Verbindung konnte nicht eingerichtet werden.','error');
+      return false;
     }
   };
 
@@ -85,15 +111,24 @@
     if(el.disabled)return;
     el.disabled=true;
     el.textContent='Startet …';
-    setStatus('Update wird angefordert …','running');
+    setStatus('Update wird gestartet …','running');
     beforeGeneratedAt=await getReportVersion();
     try{
-      const r=await fetch(API,{
+      let r=await fetch(API,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'request'})
       });
-      const d=await r.json().catch(()=>({}));
+      let d=await r.json().catch(()=>({}));
+
+      if(r.status===503&&d.setup_required){
+        el.disabled=false;
+        el.textContent='Update';
+        setStatus('Einmalige GitHub-Verbindung nötig.','info');
+        const configured=await setupGitHub();
+        if(configured)setTimeout(requestUpdate,400);
+        return;
+      }
       if(r.status===429){
         const mins=Math.max(1,Math.ceil(Number(d.cooldown_seconds||60)/60));
         setStatus(`Bereits kürzlich aktualisiert. In ca. ${mins} Min. wieder möglich.`,'info');
@@ -104,7 +139,7 @@
       if(!r.ok||!d.pending)throw Error();
       requestedAt=d.requested_at||new Date().toISOString();
       localStorage.setItem('go-eschenbach-last-update-request',requestedAt);
-      setStatus(d.already_pending?'Aktualisierung läuft bereits …':'Aktualisierung gestartet …','running');
+      setStatus(d.phase==='running'?'Aktualisierung läuft …':'Update gestartet …','running');
       el.textContent='Läuft …';
       poll();
     }catch{
@@ -135,7 +170,7 @@
         requestedAt=d.requested_at||localStorage.getItem('go-eschenbach-last-update-request');
         el.disabled=true;
         el.textContent='Läuft …';
-        setStatus('Aktualisierung läuft …','running');
+        setStatus(d.phase==='running'?'Aktualisierung läuft …':'Update startet …','running');
         poll();
       }
     }catch{}
