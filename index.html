@@ -19,9 +19,13 @@
   <link rel="stylesheet" href="match-tip.css?v=2">
   <link rel="stylesheet" href="app-menu.css?v=2">
   <link rel="stylesheet" href="mood-meter.css?v=1">
+  <link rel="stylesheet" href="share-button.css?v=1">
 </head>
 <body>
   <header class="hero">
+    <button id="shareAppButton" class="share-button" type="button" aria-label="GO Eschenbach II teilen" title="App teilen">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M8 7l4-4 4 4M5 11v8h14v-8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
     <button id="appMenuButton" class="app-menu-button" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="appMenuPanel">
       <span></span><span></span><span></span>
     </button>
@@ -38,6 +42,8 @@
       <p>Der aktuelle Überblick mit Fokus auf FC Eschenbach II</p>
     </div>
   </header>
+
+  <div id="shareToast" class="share-toast" hidden></div>
 
   <main id="app" class="wrap">
     <section class="status-card skeleton">Bericht wird geladen …</section>
@@ -60,6 +66,7 @@
   <script src="match-tip.js?v=2" defer></script>
   <script src="app-menu.js?v=2" defer></script>
   <script src="mood-meter.js?v=1" defer></script>
+  <script src="share-button.js?v=1" defer></script>
   <script src="admin-update.js?v=2" defer></script>
 </body>
 </html>
