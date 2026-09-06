@@ -4,7 +4,10 @@
   if(!el)return;
 
   const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request';
+  const BASELINE_KEY='go-eschenbach-before-generated-at';
+  const REQUEST_KEY='go-eschenbach-last-update-request';
   let pollTimer=null;
+  let reportWatchTimer=null;
   let holdTimer=null;
   let requestedAt=null;
   let beforeGeneratedAt='';
@@ -27,26 +30,54 @@
   const stopPolling=()=>{
     if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
   };
+  const stopReportWatch=()=>{
+    if(reportWatchTimer){clearTimeout(reportWatchTimer);reportWatchTimer=null;}
+  };
   const cancelHold=()=>{
     if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}
   };
 
+  const finishPublished=()=>{
+    stopPolling();
+    stopReportWatch();
+    localStorage.removeItem(BASELINE_KEY);
+    localStorage.removeItem(REQUEST_KEY);
+    setStatus('Aktualisiert ✓','done');
+    el.textContent='Aktualisiert';
+    setTimeout(()=>location.reload(),700);
+  };
+
+  const checkPublishedReport=async()=>{
+    const current=await getReportVersion();
+    if(current && beforeGeneratedAt && current!==beforeGeneratedAt){
+      finishPublished();
+      return true;
+    }
+    return false;
+  };
+
+  const watchPublishedReport=(started=Date.now())=>{
+    stopReportWatch();
+    const tick=async()=>{
+      if(await checkPublishedReport())return;
+      if(Date.now()-started>=150000)return;
+      reportWatchTimer=setTimeout(tick,4000);
+    };
+    tick();
+  };
+
   const waitForPublishedReport=async()=>{
     setStatus('Bericht wird veröffentlicht …','publishing');
-    const started=Date.now();
-    while(Date.now()-started<120000){
-      await new Promise(r=>setTimeout(r,5000));
-      const current=await getReportVersion();
-      if(current && current!==beforeGeneratedAt){
-        setStatus('Aktualisiert ✓','done');
-        el.textContent='Aktualisiert';
-        setTimeout(()=>location.reload(),900);
-        return;
+    if(await checkPublishedReport())return;
+    watchPublishedReport();
+    setTimeout(()=>{
+      if(reportWatchTimer){
+        stopReportWatch();
+        setStatus('Aktualisiert. App kurz neu öffnen.','done');
+        el.textContent='Update';
+        el.disabled=false;
       }
-    }
-    setStatus('Aktualisiert. App kurz neu öffnen.','done');
-    el.textContent='Update';
-    el.disabled=false;
+    },150000);
   };
 
   const poll=async()=>{
@@ -66,6 +97,7 @@
       const failedAt=d.failed_at?new Date(d.failed_at).getTime():0;
       const reqTime=requestedAt?new Date(requestedAt).getTime():0;
       if(failedAt && (!reqTime||failedAt>=reqTime)){
+        stopReportWatch();
         setStatus('Aktualisierung fehlgeschlagen. Bitte nochmals versuchen.','error');
         el.textContent='Update';
         el.disabled=false;
@@ -113,6 +145,7 @@
     el.textContent='Startet …';
     setStatus('Update wird gestartet …','running');
     beforeGeneratedAt=await getReportVersion();
+    if(beforeGeneratedAt)localStorage.setItem(BASELINE_KEY,beforeGeneratedAt);
     try{
       let r=await fetch(API,{
         method:'POST',
@@ -138,11 +171,13 @@
       }
       if(!r.ok||!d.pending)throw Error();
       requestedAt=d.requested_at||new Date().toISOString();
-      localStorage.setItem('go-eschenbach-last-update-request',requestedAt);
+      localStorage.setItem(REQUEST_KEY,requestedAt);
       setStatus(d.phase==='running'?'Aktualisierung läuft …':'Update gestartet …','running');
       el.textContent='Läuft …';
+      watchPublishedReport();
       poll();
     }catch{
+      stopReportWatch();
       setStatus('Update konnte nicht gestartet werden.','error');
       el.textContent='Update';
       el.disabled=false;
@@ -166,12 +201,18 @@
       if(!r.ok)return;
       const d=await r.json();
       if(d.pending){
-        beforeGeneratedAt=await getReportVersion();
-        requestedAt=d.requested_at||localStorage.getItem('go-eschenbach-last-update-request');
+        beforeGeneratedAt=localStorage.getItem(BASELINE_KEY)||await getReportVersion();
+        requestedAt=d.requested_at||localStorage.getItem(REQUEST_KEY);
         el.disabled=true;
         el.textContent='Läuft …';
         setStatus(d.phase==='running'?'Aktualisierung läuft …':'Update startet …','running');
+        watchPublishedReport();
         poll();
+      }else{
+        beforeGeneratedAt=localStorage.getItem(BASELINE_KEY)||'';
+        if(beforeGeneratedAt && await checkPublishedReport())return;
+        localStorage.removeItem(BASELINE_KEY);
+        localStorage.removeItem(REQUEST_KEY);
       }
     }catch{}
   })();
