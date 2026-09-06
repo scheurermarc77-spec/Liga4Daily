@@ -1,4 +1,26 @@
 (()=>{
+  const fitPairing=row=>{
+    const pairing=row?.children?.[1];
+    if(!pairing||pairing.tagName!=='DIV')return;
+    pairing.classList.add('match-pairing');
+    pairing.style.whiteSpace='nowrap';
+    pairing.style.fontSize='';
+    pairing.style.letterSpacing='';
+    requestAnimationFrame(()=>{
+      let size=parseFloat(getComputedStyle(pairing).fontSize)||16;
+      const minSize=9.5;
+      while(pairing.scrollWidth>pairing.clientWidth&&size>minSize){
+        size=Math.max(minSize,size-.5);
+        pairing.style.fontSize=`${size}px`;
+      }
+      if(pairing.scrollWidth>pairing.clientWidth)pairing.style.letterSpacing='-.02em';
+    });
+  };
+
+  const fitAllPairings=()=>{
+    document.querySelectorAll('#app .review-card .match,#app .outlook-card .match').forEach(fitPairing);
+  };
+
   const decorate=()=>{
     const cards=[...document.querySelectorAll('#app section.card')];
     if(!cards.length)return false;
@@ -13,6 +35,7 @@
 
     document.querySelectorAll('#app .review-card .match,#app .outlook-card .match').forEach(row=>{
       if(row.textContent.includes('FC Eschenbach II'))row.classList.add('eschenbach-match');
+      fitPairing(row);
     });
 
     const scorerCard=document.querySelector('#app .scorers-card');
@@ -38,5 +61,11 @@
     }
   }
 
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=19').catch(()=>{});}
+  let resizeTimer=null;
+  addEventListener('resize',()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(fitAllPairings,100);
+  });
+
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=20').catch(()=>{});}
 })();
