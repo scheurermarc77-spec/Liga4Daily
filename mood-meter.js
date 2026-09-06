@@ -1,10 +1,5 @@
 (()=>{
   const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/section-moods-public';
-  const moods=[
-    {id:'fire',emoji:'🔥',label:'Stark'},
-    {id:'heart',emoji:'💛',label:'Hopp Eschenbach'},
-    {id:'ball',emoji:'⚽',label:'Weiter so'}
-  ];
   const deviceKey='go-eschenbach-mood-device';
   let rebuildTimer=null;
 
@@ -29,34 +24,37 @@
   const sectionKey=heading=>`heading:${heading.textContent.trim()}`.slice(0,300);
   const savedKey=key=>`go-eschenbach-mood-choice:${key}`;
 
-  async function loadCounts(key,meter){
+  async function loadCount(key,meter){
+    const count=meter.querySelector('.mood-meter-count');
     const status=meter.querySelector('.mood-meter-status');
     try{
       const r=await fetch(`${API}?section_key=${encodeURIComponent(key)}`,{cache:'no-store'});
       if(!r.ok)throw Error();
       const d=await r.json();
-      moods.forEach(m=>{const el=meter.querySelector(`[data-mood-count="${m.id}"]`);if(el)el.textContent=String(d.counts?.[m.id]||0)});
-      if(status)status.textContent=d.total?`${d.total} ${d.total===1?'Reaktion':'Reaktionen'}`:'Noch keine Reaktion';
+      if(count)count.textContent=String(d.count||0);
+      if(status)status.textContent='';
     }catch{
-      if(status)status.textContent='Stimmung gerade nicht verfügbar.';
+      if(status)status.textContent='Gerade nicht verfügbar';
     }
   }
 
-  async function vote(key,mood,meter){
-    const buttons=[...meter.querySelectorAll('.mood-meter-button')];
+  async function cheer(key,meter){
+    const button=meter.querySelector('.mood-meter-button');
     const status=meter.querySelector('.mood-meter-status');
-    buttons.forEach(b=>b.disabled=true);
+    if(!button)return;
+    button.disabled=true;
     if(status)status.textContent='Wird gespeichert …';
     try{
-      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({section_key:key,device_id:getDeviceId(),mood})});
+      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({section_key:key,device_id:getDeviceId()})});
       if(!r.ok)throw Error();
-      localStorage.setItem(savedKey(key),mood);
-      buttons.forEach(b=>{const selected=b.dataset.mood===mood;b.classList.toggle('is-selected',selected);b.setAttribute('aria-pressed',selected?'true':'false')});
-      await loadCounts(key,meter);
+      localStorage.setItem(savedKey(key),'heart');
+      button.classList.add('is-selected');
+      button.setAttribute('aria-pressed','true');
+      await loadCount(key,meter);
     }catch{
-      if(status)status.textContent='Speichern hat nicht funktioniert.';
+      if(status)status.textContent='Speichern nicht möglich';
     }finally{
-      buttons.forEach(b=>b.disabled=false);
+      button.disabled=false;
     }
   }
 
@@ -64,18 +62,14 @@
     if(heading.dataset.moodMeterMounted==='1')return;
     heading.dataset.moodMeterMounted='1';
     const key=sectionKey(heading);
-    const selected=localStorage.getItem(savedKey(key));
+    const selected=localStorage.getItem(savedKey(key))==='heart';
     const meter=document.createElement('div');
     meter.className='mood-meter';
     meter.dataset.moodKey=key;
-    meter.innerHTML=`<span class="mood-meter-label">Stimmungsbarometer</span><div class="mood-meter-actions">${moods.map(m=>`<button class="mood-meter-button${selected===m.id?' is-selected':''}" type="button" data-mood="${m.id}" aria-label="${m.label}" aria-pressed="${selected===m.id?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">${m.emoji}</span><span>${m.label}</span><span class="mood-meter-count" data-mood-count="${m.id}">0</span></button>`).join('')}</div><div class="mood-meter-status">Stimmung wird geladen …</div>`;
+    meter.innerHTML=`<button class="mood-meter-button${selected?' is-selected':''}" type="button" aria-label="Hopp Eschenbach" aria-pressed="${selected?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">💛</span><span>Hopp Eschenbach</span><span class="mood-meter-count">0</span></button><span class="mood-meter-status" aria-live="polite"></span>`;
     heading.insertAdjacentElement('afterend',meter);
-    meter.addEventListener('click',event=>{
-      const button=event.target.closest('.mood-meter-button');
-      if(!button)return;
-      vote(key,button.dataset.mood,meter);
-    });
-    loadCounts(key,meter);
+    meter.querySelector('.mood-meter-button')?.addEventListener('click',()=>cheer(key,meter));
+    loadCount(key,meter);
   }
 
   const rebuild=()=>collectHeadings().forEach(mountHeading);
