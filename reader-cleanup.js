@@ -1,4 +1,20 @@
 (()=>{
+  const originalFetch=window.fetch.bind(window);
+  window.fetch=async(...args)=>{
+    const response=await originalFetch(...args);
+    const requestUrl=String(typeof args[0]==='string'?args[0]:args[0]?.url||'');
+    if(!requestUrl.includes('data/report.json'))return response;
+    try{
+      const data=await response.clone().json();
+      if(Array.isArray(data.upcoming_matches)){
+        data.upcoming_matches=data.upcoming_matches.filter(match=>/FC\s+Eschenbach\s+II/i.test(String(match.home||''))||/FC\s+Eschenbach\s+II/i.test(String(match.away||'')));
+      }
+      return new Response(JSON.stringify(data),{status:response.status,statusText:response.statusText,headers:response.headers});
+    }catch{
+      return response;
+    }
+  };
+
   function cleanReaderText(value){
     let text=String(value??'').trim();
     if(!text)return'';
