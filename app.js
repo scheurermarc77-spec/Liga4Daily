@@ -2,16 +2,15 @@ const app=document.getElementById('app');
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const val=v=>v===null||v===undefined?'–':esc(v);
 
-const provenancePattern=/(quelle|quellen|matchcenter|vereinswebsite|vereinswebseite|website|webseite|verifizier|geprüft|recherche|berichtszeitraum|offiziell(?:e|en|er|es)?\s+IFV-(?:daten|rangliste)|IFV-Daten|stützt sich|penalty_points|datenquelle|übernommen|kontrollsumme|audit)/i;
+const provenancePattern=/(quelle|quellen|matchcenter|vereinswebsite|vereinswebseite|website|webseite|verifizier|geprüft|recherche|berichtszeitraum|offiziell(?:e|en|er|es)?\s+IFV-(?:daten|rangliste)|IFV-Daten|stützt sich|penalty_points|datenquelle|übernommen|kontrollsumme|audit|IFV-Spielnummer)/i;
 function readerText(value){
-  const text=String(value??'').trim();
-  if(!text)return'';
-  const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text];
-  return sentences.map(s=>s.trim()).filter(s=>s&&!provenancePattern.test(s)).join(' ');
+  return String(value??'').trim();
 }
 function readerNote(value){
   const text=readerText(value);
-  if(/^Meisterschaft\s+5\.\s*Liga,?\s*Gruppe\s*4\.?$/i.test(text))return'';
+  if(!text)return'';
+  if(provenancePattern.test(text))return'';
+  if(/^Meisterschaft(?:,?\s*5\.\s*Liga,?\s*Gruppe\s*4)?\.?$/i.test(text))return'';
   return text;
 }
 const matchHTML=m=>{const note=readerNote(m.note);return`<div class="match"><div class="muted">${esc(m.date)} ${esc(m.time||'')}</div><div><strong>${esc(m.home)}</strong> – <strong>${esc(m.away)}</strong> ${m.home_goals!=null?`<span class="score">${m.home_goals}:${m.away_goals}</span>`:''}</div>${note?`<div class="muted">${esc(note)}</div>`:''}</div>`};
@@ -109,4 +108,4 @@ logoButton?.addEventListener('click',openLogo);
 logoClose?.addEventListener('click',closeLogo);
 logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=16').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=21').catch(()=>{})}
