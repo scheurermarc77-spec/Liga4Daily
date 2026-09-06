@@ -1,7 +1,7 @@
 (()=>{
   const el=document.getElementById('bottomUpdate');
   if(!el)return;
-  const url='https://github.com/scheurermarc77-spec/Liga4Daily/actions/workflows/daily-report.yml';
+  const url='https://github.com/go-eschenbach-ii/go-eschenbach-ii.github.io/actions/workflows/daily-report.yml';
   let timer=null;
   const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
   const start=e=>{
