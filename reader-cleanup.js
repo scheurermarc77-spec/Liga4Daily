@@ -37,6 +37,21 @@
     return text;
   }
 
+  function cleanReviewText(value){
+    const text=cleanReaderText(value);
+    if(!text)return'';
+    const scorePattern=/\b\d{1,2}\s*:\s*\d{1,2}\b/;
+    const specialPattern=/(Spitzenspiel|Topspiel|Kellerduell|Überrasch|Sensation|Derby|Kantersieg|Torflut|Ausrufezeichen|Verfolgerduell|Schlüsselspiel|direktes?\s+Duell|Leader|Tabellenspitze|Schlusslicht|erste\s+Punkte|erster\s+Sieg|erste\s+Niederlage|ungeschlagen|Serie|Rekord)/i;
+    const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text];
+    return sentences.map(s=>s.trim()).filter(s=>{
+      if(!s)return false;
+      if(/FC\s+Eschenbach\s+II/i.test(s))return true;
+      if(/(?:übrigen|weiteren|anderen)\s+Resultate\s*:/i.test(s)&&!specialPattern.test(s))return false;
+      if(scorePattern.test(s)&&!specialPattern.test(s))return false;
+      return true;
+    }).join(' ').replace(/\s{2,}/g,' ').trim();
+  }
+
   function cleanup(){
     const app=document.getElementById('app');
     if(!app)return false;
@@ -50,7 +65,17 @@
       }
     });
 
+    const reviewCard=[...app.querySelectorAll('.card')].find(card=>card.querySelector('h2')?.textContent?.trim()==='Rückblick');
+    if(reviewCard){
+      reviewCard.querySelectorAll('p').forEach(el=>{
+        const original=el.textContent||'';
+        const cleaned=cleanReviewText(original);
+        if(cleaned!==original.trim())el.textContent=cleaned;
+      });
+    }
+
     app.querySelectorAll('.card p').forEach(el=>{
+      if(reviewCard?.contains(el))return;
       const original=el.textContent||'';
       const cleaned=cleanReaderText(original);
       if(cleaned!==original.trim())el.textContent=cleaned;
