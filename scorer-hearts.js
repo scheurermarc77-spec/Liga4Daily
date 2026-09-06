@@ -56,20 +56,6 @@
     return [...card.children].filter(el=>el.classList?.contains('match'));
   }
 
-  function setStatus(text){
-    const card=findScorerCard();
-    if(!card)return;
-    let el=card.querySelector('.scorer-hearts-status');
-    if(!el){
-      el=document.createElement('div');
-      el.className='scorer-hearts-status';
-      el.setAttribute('aria-live','polite');
-      const summary=[...card.children].find(child=>child.classList?.contains('muted'));
-      if(summary)card.insertBefore(el,summary);else card.appendChild(el);
-    }
-    el.textContent=text||'';
-  }
-
   function mountRows(){
     let mounted=false;
     scorerRows().forEach(row=>{
@@ -88,8 +74,8 @@
       button.className='scorer-heart-button';
       button.type='button';
       button.dataset.playerKey=key;
-      button.setAttribute('aria-label',`Volltreffer für ${name}`);
-      button.innerHTML='<span class="scorer-heart-icon" aria-hidden="true">❤️</span><span class="scorer-heart-label">Volltreffer</span><span class="scorer-heart-count">0</span>';
+      button.setAttribute('aria-label',`Herz für ${name}`);
+      button.innerHTML='<span class="scorer-heart-icon" aria-hidden="true">❤️</span><span class="scorer-heart-count">0</span>';
       button.addEventListener('click',()=>vote(name,key));
       wrap.appendChild(button);
       content.appendChild(wrap);
@@ -109,8 +95,6 @@
       button.setAttribute('aria-pressed',selected?'true':'false');
       button.disabled=Boolean(state.voted_player_key)||loading;
     });
-    if(state.voted_player_key)setStatus('Dein Volltreffer ist gesetzt. Beim nächsten Eschenbach-Spiel kannst du wieder wählen.');
-    else setStatus('Pro Person ein Volltreffer. Ab dem nächsten Spielbeginn ist ein weiterer möglich.');
   }
 
   async function refreshState(){
@@ -121,16 +105,13 @@
       const d=await r.json();
       state={counts:d.counts||{},voted_player_key:d.voted_player_key||null};
       renderState();
-    }catch{
-      setStatus('Volltreffer sind gerade nicht verfügbar.');
-    }
+    }catch{}
   }
 
   async function vote(name,key){
     if(!cycle||state.voted_player_key||loading)return;
     loading=true;
     renderState();
-    setStatus('Volltreffer wird gespeichert …');
     try{
       const r=await fetch(API,{
         method:'POST',
@@ -146,9 +127,7 @@
       if(!r.ok)throw Error();
       state.voted_player_key=key;
       state.counts[key]=(Number(state.counts[key])||0)+1;
-    }catch{
-      setStatus('Volltreffer konnte nicht gespeichert werden.');
-    }finally{
+    }catch{}finally{
       loading=false;
       renderState();
     }
