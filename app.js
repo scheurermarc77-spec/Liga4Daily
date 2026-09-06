@@ -76,8 +76,11 @@ function render(d){
   const lead=readerText(d.lead);
   const scorerInfo=scorerSummary(d);
   app.innerHTML=`
-<section class="team-photo-inline" id="teamPhotoCard">
-  <img src="team-photo.jpg?v=3" alt="Mannschaft FC Eschenbach II" loading="eager" onerror="document.getElementById('teamPhotoCard').style.display='none'">
+<section class="team-photo-block" id="teamPhotoCard">
+  <div class="team-photo-inline">
+    <img src="team-photo.jpg?v=3" alt="Mannschaft FC Eschenbach II" loading="eager" onerror="document.getElementById('teamPhotoCard').style.display='none'">
+  </div>
+  <div class="team-photo-source"><a href="https://fceschenbach.ch/aktive/2-mannschaft" target="_blank" rel="noopener">Quelle</a></div>
 </section>
 <section class="card report-card">
   <div class="update-sticker ${fresh.tone}" aria-label="Aktualisiert am ${fresh.date} ${fresh.time}">
