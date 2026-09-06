@@ -53,6 +53,20 @@ function scorerSummary(d){
   return`${playerGoals} Tore durch Eschenbacher Spieler.`;
 }
 
+function scorersHTML(items){
+  const list=Array.isArray(items)?items:[];
+  if(!list.length)return'';
+  const top=Math.max(...list.map(s=>Number(s.goals)||0));
+  let topMarked=false;
+  return list.map(s=>{
+    const goals=Number(s.goals)||0;
+    const isTop=!topMarked&&goals===top;
+    if(isTop)topMarked=true;
+    const goalWord=goals===1?'Tor':'Tore';
+    return `<div class="match" style="position:relative;${isTop?'padding-left:clamp(92px,25vw,112px);min-height:58px;display:flex;align-items:center;':''}">${isTop?'<span style="position:absolute;left:-14px;top:50%;transform:translateY(-50%) rotate(-4deg);background:#d71920;color:#fff;border:2px solid #111;box-shadow:4px 4px 0 #111;padding:7px 16px 7px 17px;font-size:10px;line-height:1;font-weight:950;letter-spacing:.09em;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);z-index:1;white-space:nowrap">TOPSCORER</span>':''}<div><strong>${esc(s.name)}</strong> · ${esc(goals)} ${goalWord}</div></div>`;
+  }).join('');
+}
+
 function render(d){
   const e=d.eschenbach||{};
   const fresh=freshnessInfo(d.generated_at);
@@ -76,7 +90,7 @@ function render(d){
 <section class="card"><h2>Rückblick</h2><p>${esc(review)}</p>${(d.recent_results||[]).map(matchHTML).join('')}</section>
 <section class="card standings-card"><h2>Aktuelle Situation</h2><p>${esc(situation)}</p><div class="table-wrap"><table class="standings"><thead><tr><th>#</th><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Str</th><th>Tore</th><th>TD</th><th>Pkt</th></tr></thead><tbody>${(d.standings||[]).map(raw=>{const r=fullRow(raw);return`<tr class="${r.is_eschenbach?'fce':''}"><td>${val(r.rank)}</td><td>${esc(r.team)}</td><td>${val(r.played)}</td><td>${val(r.wins)}</td><td>${val(r.draws)}</td><td>${val(r.losses)}</td><td>${val(r.penalty_points)}</td><td>${r.goals_for!=null&&r.goals_against!=null?`${r.goals_for}:${r.goals_against}`:'–'}</td><td>${r.goal_difference!=null?`${r.goal_difference>0?'+':''}${r.goal_difference}`:'–'}</td><td><strong>${val(r.points)}</strong></td></tr>`}).join('')}</tbody></table></div><div class="table-legend">Sp = Spiele · S = Siege · U = Unentschieden · N = Niederlagen · Str = Strafpunkte · TD = Tordifferenz</div></section>
 <section class="card"><h2>Ausblick</h2><p>${esc(outlook)}</p><h3 class="section-subtitle">Kommende Spiele</h3>${(d.upcoming_matches||[]).map(matchHTML).join('')}</section>
-${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${d.scorers.map(s=>`<div class="match"><strong>${esc(s.name)}</strong> · ${esc(s.goals)} Tore</div>`).join('')}${scorerInfo?`<div class="muted">${esc(scorerInfo)}</div>`:''}</section>`:''}`;
+${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${scorersHTML(d.scorers)}${scorerInfo?`<div class="muted">${esc(scorerInfo)}</div>`:''}</section>`:''}`;
 }
 
 fetch('data/report.json?'+Date.now()).then(r=>{if(!r.ok)throw Error();return r.json()}).then(render).catch(()=>app.innerHTML='<section class="status-card">Der Tagesbericht konnte gerade nicht geladen werden.</section>');
@@ -92,4 +106,4 @@ logoButton?.addEventListener('click',openLogo);
 logoClose?.addEventListener('click',closeLogo);
 logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=14').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=15').catch(()=>{})}
