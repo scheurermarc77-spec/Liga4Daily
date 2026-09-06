@@ -36,8 +36,10 @@ function render(d){
   <span class="update-sticker-icon" aria-hidden="true">↻</span>
   <div class="update-sticker-copy"><span>AKTUALISIERT AM</span><strong>${fresh.date}</strong>${fresh.time?`<small>${fresh.time}</small>`:''}</div>
 </section>
+<section class="team-photo-inline" id="teamPhotoCard">
+  <img src="team-photo.jpg?v=3" alt="Mannschaft FC Eschenbach II" loading="eager" onerror="document.getElementById('teamPhotoCard').style.display='none'">
+</section>
 <section class="card"><span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(d.lead)}</p></section>
-<section class="card team-photo-card" id="teamPhotoCard"><h2>Mannschaft FC Eschenbach II</h2><button id="teamPhotoButton" class="team-photo-button" type="button" aria-label="Mannschaftsbild vergrössern"><img class="team-photo-thumb" src="team-photo.jpg?v=2" alt="Mannschaft FC Eschenbach II" loading="lazy" onerror="document.getElementById('teamPhotoCard').style.display='none'"><span class="team-photo-caption"><strong>Offizielles Mannschaftsbild</strong><span>Antippen zum Vergrössern ↗</span></span></button></section>
 <section class="grid"><div class="stat"><strong>${esc(e.rank?`#${e.rank}`:'–')}</strong><span>Rang</span></div><div class="stat"><strong>${val(e.points)}</strong><span>Punkte</span></div><div class="stat"><strong>${val(e.wins)}</strong><span>Siege</span></div></section>
 <section class="card"><h2>Rückblick</h2><p>${esc(d.review)}</p>${(d.recent_results||[]).map(matchHTML).join('')}</section>
 <section class="card standings-card"><h2>Aktuelle Situation</h2><p>${esc(d.current_situation)}</p><div class="table-wrap"><table class="standings"><thead><tr><th>#</th><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Str</th><th>Tore</th><th>TD</th><th>Pkt</th></tr></thead><tbody>${(d.standings||[]).map(raw=>{const r=fullRow(raw);return`<tr class="${r.is_eschenbach?'fce':''}"><td>${val(r.rank)}</td><td>${esc(r.team)}</td><td>${val(r.played)}</td><td>${val(r.wins)}</td><td>${val(r.draws)}</td><td>${val(r.losses)}</td><td>${val(r.penalty_points)}</td><td>${r.goals_for!=null&&r.goals_against!=null?`${r.goals_for}:${r.goals_against}`:'–'}</td><td>${r.goal_difference!=null?`${r.goal_difference>0?'+':''}${r.goal_difference}`:'–'}</td><td><strong>${val(r.points)}</strong></td></tr>`}).join('')}</tbody></table></div><div class="table-legend">Sp = Spiele · S = Siege · U = Unentschieden · N = Niederlagen · Str = Strafpunkte · TD = Tordifferenz</div></section>
@@ -50,10 +52,12 @@ fetch('data/report.json?'+Date.now()).then(r=>{if(!r.ok)throw Error();return r.j
 const logoButton=document.getElementById('logoButton');
 const logoModal=document.getElementById('logoModal');
 const logoClose=document.getElementById('logoClose');
-const teamPhotoModal=document.getElementById('teamPhotoModal');
-const teamPhotoClose=document.getElementById('teamPhotoClose');
 function openModal(modal,closeButton){if(!modal)return;modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');closeButton?.focus();}
 function closeModal(modal,returnFocus){if(!modal)return;modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');returnFocus?.focus();}
-function openLogo(){openModal(logoModal,logoClose)}function closeLogo(){closeModal(logoModal,logoButton)}function openTeamPhoto(){openModal(teamPhotoModal,teamPhotoClose)}function closeTeamPhoto(){closeModal(teamPhotoModal,document.getElementById('teamPhotoButton'))}
-logoButton?.addEventListener('click',openLogo);logoClose?.addEventListener('click',closeLogo);logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});teamPhotoClose?.addEventListener('click',closeTeamPhoto);teamPhotoModal?.addEventListener('click',e=>{if(e.target===teamPhotoModal)closeTeamPhoto();});document.addEventListener('click',e=>{if(e.target.closest('#teamPhotoButton'))openTeamPhoto();});document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(logoModal&&!logoModal.hidden)closeLogo();if(teamPhotoModal&&!teamPhotoModal.hidden)closeTeamPhoto();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=11').catch(()=>{})}
+function openLogo(){openModal(logoModal,logoClose)}
+function closeLogo(){closeModal(logoModal,logoButton)}
+logoButton?.addEventListener('click',openLogo);
+logoClose?.addEventListener('click',closeLogo);
+logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=12').catch(()=>{})}
