@@ -63,7 +63,7 @@ function scorersHTML(items){
     const isTop=!topMarked&&goals===top;
     if(isTop)topMarked=true;
     const goalWord=goals===1?'Tor':'Tore';
-    return `<div class="match" style="position:relative;${isTop?'padding-left:clamp(92px,25vw,112px);min-height:58px;display:flex;align-items:center;':''}">${isTop?'<span style="position:absolute;left:-14px;top:50%;transform:translateY(-50%) rotate(-4deg);background:#d71920;color:#fff;border:2px solid #111;box-shadow:4px 4px 0 #111;padding:7px 16px 7px 17px;font-size:10px;line-height:1;font-weight:950;letter-spacing:.09em;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);z-index:1;white-space:nowrap">TOPSCORER</span>':''}<div><strong>${esc(s.name)}</strong> · ${esc(goals)} ${goalWord}</div></div>`;
+    return `<div class="match" style="position:relative;${isTop?'padding-right:clamp(92px,25vw,112px);min-height:58px;display:flex;align-items:center;':''}">${isTop?'<span style="position:absolute;right:-14px;top:50%;transform:translateY(-50%) rotate(4deg);background:#d71920;color:#fff;border:2px solid #111;box-shadow:-4px 4px 0 #111;padding:7px 17px 7px 16px;font-size:10px;line-height:1;font-weight:950;letter-spacing:.09em;clip-path:polygon(12% 0,100% 0,100% 100%,0 100%);z-index:1;white-space:nowrap">TOPSCORER</span>':''}<div><strong>${esc(s.name)}</strong> · ${esc(goals)} ${goalWord}</div></div>`;
   }).join('');
 }
 
@@ -106,4 +106,4 @@ logoButton?.addEventListener('click',openLogo);
 logoClose?.addEventListener('click',closeLogo);
 logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=15').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=16').catch(()=>{})}
