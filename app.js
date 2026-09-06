@@ -20,26 +20,21 @@ const legacyStats={
 const fullRow=r=>({...legacyStats[r.team],...r});
 
 function freshnessInfo(value){
-  if(!value)return{label:'Noch keine Aktualisierung',detail:'Letzte Recherche unbekannt',tone:'stale'};
+  if(!value)return{date:'unbekannt',time:'',tone:'stale'};
   const m=String(value).match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})$/);
-  if(!m)return{label:'Aktualisiert',detail:esc(value),tone:'fresh'};
+  if(!m)return{date:esc(value),time:'',tone:'fresh'};
   const dt=new Date(Number(m[3]),Number(m[2])-1,Number(m[1]),Number(m[4]),Number(m[5]));
-  const now=new Date();
-  const startNow=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const startDt=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
-  const days=Math.round((startNow-startDt)/86400000);
-  const when=days===0?'Heute':days===1?'Gestern':`${m[1]}.${m[2]}.${m[3]}`;
-  const hours=(now-dt)/3600000;
-  return{label:hours<24?'Bericht frisch':'Letzte Recherche',detail:`${when} · ${m[4]}:${m[5]} Uhr`,tone:hours<24?'fresh':hours<72?'warm':'stale'};
+  const hours=(new Date()-dt)/3600000;
+  return{date:`${m[1]}.${m[2]}.${m[3]}`,time:`${m[4]}:${m[5]} Uhr`,tone:hours<24?'fresh':hours<72?'warm':'stale'};
 }
 
 function render(d){
   const e=d.eschenbach||{};
   const fresh=freshnessInfo(d.generated_at);
   app.innerHTML=`
-<section class="freshness-card ${fresh.tone}">
-  <div class="freshness-orbit"><span class="freshness-dot"></span></div>
-  <div><span class="freshness-kicker">UPDATE-PULS</span><strong>${fresh.label}</strong><small>${fresh.detail}</small></div>
+<section class="update-sticker ${fresh.tone}" aria-label="Aktualisiert am ${fresh.date} ${fresh.time}">
+  <span class="update-sticker-icon" aria-hidden="true">↻</span>
+  <div class="update-sticker-copy"><span>AKTUALISIERT AM</span><strong>${fresh.date}</strong>${fresh.time?`<small>${fresh.time}</small>`:''}</div>
 </section>
 <section class="card"><span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(d.lead)}</p></section>
 <section class="card team-photo-card" id="teamPhotoCard"><h2>Mannschaft FC Eschenbach II</h2><button id="teamPhotoButton" class="team-photo-button" type="button" aria-label="Mannschaftsbild vergrössern"><img class="team-photo-thumb" src="team-photo.jpg?v=2" alt="Mannschaft FC Eschenbach II" loading="lazy" onerror="document.getElementById('teamPhotoCard').style.display='none'"><span class="team-photo-caption"><strong>Offizielles Mannschaftsbild</strong><span>Antippen zum Vergrössern ↗</span></span></button></section>
@@ -61,4 +56,4 @@ function openModal(modal,closeButton){if(!modal)return;modal.hidden=false;modal.
 function closeModal(modal,returnFocus){if(!modal)return;modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');returnFocus?.focus();}
 function openLogo(){openModal(logoModal,logoClose)}function closeLogo(){closeModal(logoModal,logoButton)}function openTeamPhoto(){openModal(teamPhotoModal,teamPhotoClose)}function closeTeamPhoto(){closeModal(teamPhotoModal,document.getElementById('teamPhotoButton'))}
 logoButton?.addEventListener('click',openLogo);logoClose?.addEventListener('click',closeLogo);logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});teamPhotoClose?.addEventListener('click',closeTeamPhoto);teamPhotoModal?.addEventListener('click',e=>{if(e.target===teamPhotoModal)closeTeamPhoto();});document.addEventListener('click',e=>{if(e.target.closest('#teamPhotoButton'))openTeamPhoto();});document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(logoModal&&!logoModal.hidden)closeLogo();if(teamPhotoModal&&!teamPhotoModal.hidden)closeTeamPhoto();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=10').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=11').catch(()=>{})}
