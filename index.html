@@ -17,9 +17,24 @@
   <link rel="stylesheet" href="bottom-update.css?v=2">
   <link rel="stylesheet" href="team-photo-source.css?v=1">
   <link rel="stylesheet" href="match-tip.css?v=2">
+  <link rel="stylesheet" href="app-menu.css?v=1">
 </head>
 <body>
   <header class="hero">
+    <button id="appMenuButton" class="app-menu-button" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="appMenuPanel">
+      <span></span><span></span><span></span>
+    </button>
+    <div id="appMenuPanel" class="app-menu-panel" hidden>
+      <span class="app-menu-label">Direkt zu</span>
+      <nav aria-label="Bereiche der App">
+        <button class="app-menu-link" type="button" data-menu-target="review">Rückblick</button>
+        <button class="app-menu-link" type="button" data-menu-target="current">Aktuell</button>
+        <button class="app-menu-link" type="button" data-menu-target="outlook">Ausblick</button>
+        <button class="app-menu-link" type="button" data-menu-target="tip">Resultat-Tipp</button>
+        <button class="app-menu-link" type="button" data-menu-target="scorers">Torschützen</button>
+        <button class="app-menu-link" type="button" data-menu-target="upcoming">Kommende Spiele</button>
+      </nav>
+    </div>
     <button id="logoButton" class="brand-button" type="button" aria-label="Logo von FC Eschenbach II vergrössern">
       <img class="brand-logo" src="logo-eschenbach-ii.svg?v=9" alt="FC Eschenbach II">
     </button>
@@ -49,6 +64,7 @@
   <script src="theme-enhance.js?v=1" defer></script>
   <script src="reader-cleanup.js?v=1" defer></script>
   <script src="match-tip.js?v=2" defer></script>
+  <script src="app-menu.js?v=1" defer></script>
   <script src="admin-update.js?v=2" defer></script>
 </body>
 </html>
