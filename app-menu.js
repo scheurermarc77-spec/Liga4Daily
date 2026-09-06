@@ -1,25 +1,39 @@
 (()=>{
   const button=document.getElementById('appMenuButton');
   const panel=document.getElementById('appMenuPanel');
-  if(!button||!panel)return;
+  const nav=panel?.querySelector('nav');
+  if(!button||!panel||!nav)return;
 
-  const sectionByHeading=heading=>[...document.querySelectorAll('#app > section')].find(section=>section.querySelector(':scope > h2')?.textContent?.trim()===heading);
-  const resolveTarget=name=>{
-    if(name==='review')return sectionByHeading('Rückblick');
-    if(name==='current')return sectionByHeading('Aktuelle Situation');
-    if(name==='outlook')return sectionByHeading('Ausblick');
-    if(name==='tip')return document.querySelector('#app .match-tip-card');
-    if(name==='scorers')return sectionByHeading('Eschenbach-Torschützen');
-    if(name==='upcoming')return [...document.querySelectorAll('#app .section-subtitle')].find(el=>el.textContent?.trim()==='Kommende Spiele');
-    return null;
+  let targets=[];
+  let rebuildTimer=null;
+
+  const collectHeadings=()=>{
+    const headings=[];
+    const heroTitle=document.querySelector('.hero h1');
+    if(heroTitle)headings.push(heroTitle);
+    document.querySelectorAll('#app h2,#app h3.section-subtitle').forEach(el=>headings.push(el));
+    return headings.filter(el=>el.textContent?.trim());
   };
 
-  const decorateTargets=()=>{
-    const ids={review:'rueckblick',current:'aktuell',outlook:'ausblick',tip:'resultat-tipp',scorers:'torschuetzen',upcoming:'kommende-spiele'};
-    Object.entries(ids).forEach(([name,id])=>{
-      const target=resolveTarget(name);
-      if(target){target.id=id;target.classList.add('menu-scroll-target');}
+  const rebuild=()=>{
+    targets=collectHeadings();
+    nav.innerHTML='';
+    targets.forEach((target,index)=>{
+      const label=target.textContent.trim();
+      target.id=target.id||`app-menu-target-${index}`;
+      target.classList.add('menu-scroll-target');
+      const item=document.createElement('button');
+      item.className='app-menu-link';
+      item.type='button';
+      item.textContent=label;
+      item.dataset.menuIndex=String(index);
+      nav.appendChild(item);
     });
+  };
+
+  const scheduleRebuild=()=>{
+    clearTimeout(rebuildTimer);
+    rebuildTimer=setTimeout(rebuild,30);
   };
 
   const close=()=>{
@@ -27,15 +41,16 @@
     button.setAttribute('aria-expanded','false');
   };
   const open=()=>{
+    rebuild();
     panel.hidden=false;
     button.setAttribute('aria-expanded','true');
   };
 
   button.addEventListener('click',()=>panel.hidden?open():close());
-  panel.addEventListener('click',event=>{
-    const item=event.target.closest('[data-menu-target]');
+  nav.addEventListener('click',event=>{
+    const item=event.target.closest('[data-menu-index]');
     if(!item)return;
-    const target=resolveTarget(item.dataset.menuTarget);
+    const target=targets[Number(item.dataset.menuIndex)];
     close();
     if(target)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),40);
   });
@@ -45,7 +60,7 @@
   });
   document.addEventListener('keydown',event=>{if(event.key==='Escape')close();});
 
-  decorateTargets();
+  rebuild();
   const app=document.getElementById('app');
-  if(app){new MutationObserver(decorateTargets).observe(app,{childList:true,subtree:true});}
+  if(app)new MutationObserver(scheduleRebuild).observe(app,{childList:true,subtree:true,characterData:true});
 })();
