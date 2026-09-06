@@ -1,6 +1,7 @@
 (()=>{
   const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/section-moods-public';
   const deviceKey='go-eschenbach-mood-device';
+  const allowedHeadings=new Set(['Rückblick','Ausblick']);
   let rebuildTimer=null;
 
   const makeUuid=()=>{
@@ -14,14 +15,8 @@
     if(!id){id=makeUuid();localStorage.setItem(deviceKey,id)}
     return id;
   };
-  const isGoEschenbachHeading=el=>/^go\s+eschenbach(?:\s+ii)?$/i.test(el.textContent?.trim()||'');
-  const collectHeadings=()=>{
-    const list=[];
-    const hero=document.querySelector('.hero h1');
-    if(hero)list.push(hero);
-    document.querySelectorAll('#app h2,#app h3.section-subtitle').forEach(el=>list.push(el));
-    return list.filter(el=>el.textContent?.trim()&&!isGoEschenbachHeading(el));
-  };
+  const collectHeadings=()=>[...document.querySelectorAll('#app h2,#app h3.section-subtitle')]
+    .filter(el=>allowedHeadings.has(el.textContent?.trim()||''));
   const sectionKey=heading=>`heading:${heading.textContent.trim()}`.slice(0,300);
   const savedKey=key=>`go-eschenbach-mood-choice:${key}`;
 
@@ -60,14 +55,14 @@
   }
 
   function mountHeading(heading){
-    if(isGoEschenbachHeading(heading)||heading.dataset.moodMeterMounted==='1')return;
+    if(!allowedHeadings.has(heading.textContent?.trim()||'')||heading.dataset.moodMeterMounted==='1')return;
     heading.dataset.moodMeterMounted='1';
     const key=sectionKey(heading);
     const selected=localStorage.getItem(savedKey(key))==='heart';
     const meter=document.createElement('div');
     meter.className='mood-meter';
     meter.dataset.moodKey=key;
-    meter.innerHTML=`<button class="mood-meter-button${selected?' is-selected':''}" type="button" aria-label="Hopp Eschenbach" aria-pressed="${selected?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">💛</span><span>Hopp Eschenbach</span><span class="mood-meter-count">0</span></button><span class="mood-meter-status" aria-live="polite"></span>`;
+    meter.innerHTML=`<button class="mood-meter-button${selected?' is-selected':''}" type="button" aria-label="Hopp Eschenbach" aria-pressed="${selected?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">❤️</span><span>Hopp Eschenbach</span><span class="mood-meter-count">0</span></button><span class="mood-meter-status" aria-live="polite"></span>`;
     heading.insertAdjacentElement('afterend',meter);
     meter.querySelector('.mood-meter-button')?.addEventListener('click',()=>cheer(key,meter));
     loadCount(key,meter);
