@@ -1,5 +1,5 @@
 name: Build app icons
-# rebuild: v2
+# rebuild: black-frame-v1
 
 on:
   workflow_dispatch:
@@ -20,15 +20,39 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Create PNG icons from exact in-app logo
+      - name: Create PNG icons with black frame
         run: |
           python -m pip install --quiet cairosvg pillow
           python - <<'PY'
           import cairosvg
-          from PIL import Image
+          from PIL import Image, ImageDraw
           from pathlib import Path
-          cairosvg.svg2png(url='logo-eschenbach-ii.svg', write_to='icon-source.png', output_width=1024, output_height=1024)
-          src = Image.open('icon-source.png').convert('RGB')
+
+          cairosvg.svg2png(
+              url='logo-eschenbach-ii.svg',
+              write_to='icon-source.png',
+              output_width=1024,
+              output_height=1024
+          )
+
+          logo = Image.open('icon-source.png').convert('RGBA')
+          canvas = Image.new('RGBA', (1024, 1024), (255, 255, 255, 255))
+          canvas.alpha_composite(logo)
+
+          # Schwarzer Rahmen innerhalb des Icons, damit er auch nach der
+          # automatischen iPhone-Abrundung deutlich sichtbar bleibt.
+          draw = ImageDraw.Draw(canvas)
+          inset = 18
+          border_width = 46
+          radius = 190
+          draw.rounded_rectangle(
+              (inset, inset, 1024-inset-1, 1024-inset-1),
+              radius=radius,
+              outline=(0, 0, 0, 255),
+              width=border_width
+          )
+
+          src = canvas.convert('RGB')
           src.resize((180,180), Image.Resampling.LANCZOS).save('app-icon-180.png','PNG',optimize=True)
           src.resize((180,180), Image.Resampling.LANCZOS).save('apple-touch-icon.png','PNG',optimize=True)
           src.resize((192,192), Image.Resampling.LANCZOS).save('app-icon-192.png','PNG',optimize=True)
@@ -41,5 +65,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add apple-touch-icon.png app-icon-180.png app-icon-192.png app-icon-512.png
           git diff --cached --quiet && exit 0
-          git commit -m 'Build exact iPhone and PWA icons'
+          git commit -m 'Build app icons with black frame'
           git push
