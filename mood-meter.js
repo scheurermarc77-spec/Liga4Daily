@@ -23,24 +23,18 @@
 
   async function loadCount(key,meter){
     const count=meter.querySelector('.mood-meter-count');
-    const status=meter.querySelector('.mood-meter-status');
     try{
       const r=await fetch(`${API}?section_key=${encodeURIComponent(key)}`,{cache:'no-store'});
       if(!r.ok)throw Error();
       const d=await r.json();
       if(count)count.textContent=String(d.count||0);
-      if(status)status.textContent='';
-    }catch{
-      if(status)status.textContent='Gerade nicht verfügbar';
-    }
+    }catch{}
   }
 
   async function cheer(key,meter){
     const button=meter.querySelector('.mood-meter-button');
-    const status=meter.querySelector('.mood-meter-status');
     if(!button)return;
     button.disabled=true;
-    if(status)status.textContent='Wird gespeichert …';
     try{
       const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({section_key:key,device_id:getDeviceId()})});
       if(!r.ok)throw Error();
@@ -48,9 +42,7 @@
       button.classList.add('is-selected');
       button.setAttribute('aria-pressed','true');
       await loadCount(key,meter);
-    }catch{
-      if(status)status.textContent='Speichern nicht möglich';
-    }finally{
+    }catch{}finally{
       button.disabled=false;
     }
   }
@@ -63,7 +55,7 @@
     const meter=document.createElement('div');
     meter.className='mood-meter';
     meter.dataset.moodKey=key;
-    meter.innerHTML=`<button class="mood-meter-button${selected?' is-selected':''}" type="button" aria-label="Hopp Eschenbach" aria-pressed="${selected?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">❤️</span><span>Hopp Eschenbach</span><span class="mood-meter-count">0</span></button><span class="mood-meter-status" aria-live="polite"></span>`;
+    meter.innerHTML=`<button class="mood-meter-button${selected?' is-selected':''}" type="button" aria-label="Herz für ${heading.textContent.trim()}" aria-pressed="${selected?'true':'false'}"><span class="mood-meter-emoji" aria-hidden="true">❤️</span><span class="mood-meter-count">0</span></button>`;
     heading.insertAdjacentElement('afterend',meter);
     meter.querySelector('.mood-meter-button')?.addEventListener('click',()=>cheer(key,meter));
     loadCount(key,meter);
