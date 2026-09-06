@@ -1,7 +1,20 @@
 const app=document.getElementById('app');
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const val=v=>v===null||v===undefined?'–':esc(v);
-const matchHTML=m=>`<div class="match"><div class="muted">${esc(m.date)} ${esc(m.time||'')}</div><div><strong>${esc(m.home)}</strong> – <strong>${esc(m.away)}</strong> ${m.home_goals!=null?`<span class="score">${m.home_goals}:${m.away_goals}</span>`:''}</div>${m.note?`<div class="muted">${esc(m.note)}</div>`:''}</div>`;
+
+const provenancePattern=/(quelle|quellen|matchcenter|vereinswebsite|vereinswebseite|website|webseite|verifizier|geprüft|recherche|berichtszeitraum|offiziell(?:e|en|er|es)?\s+IFV-(?:daten|rangliste)|IFV-Daten|stützt sich|penalty_points|datenquelle|übernommen|kontrollsumme|audit)/i;
+function readerText(value){
+  const text=String(value??'').trim();
+  if(!text)return'';
+  const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text];
+  return sentences.map(s=>s.trim()).filter(s=>s&&!provenancePattern.test(s)).join(' ');
+}
+function readerNote(value){
+  const text=readerText(value);
+  if(/^Meisterschaft\s+5\.\s*Liga,?\s*Gruppe\s*4\.?$/i.test(text))return'';
+  return text;
+}
+const matchHTML=m=>{const note=readerNote(m.note);return`<div class="match"><div class="muted">${esc(m.date)} ${esc(m.time||'')}</div><div><strong>${esc(m.home)}</strong> – <strong>${esc(m.away)}</strong> ${m.home_goals!=null?`<span class="score">${m.home_goals}:${m.away_goals}</span>`:''}</div>${note?`<div class="muted">${esc(note)}</div>`:''}</div>`};
 
 // Übergang für den bereits gespeicherten Bericht vom 06.09.2026.
 // Neue Recherchen liefern diese Werte direkt aus dem IFV Matchcenter.
@@ -28,9 +41,26 @@ function freshnessInfo(value){
   return{date:`${m[1]}.${m[2]}.${m[3]}`,time:`${m[4]}:${m[5]} Uhr`,tone:hours<24?'fresh':hours<72?'warm':'stale'};
 }
 
+function scorerSummary(d){
+  const scorers=Array.isArray(d.scorers)?d.scorers:[];
+  const playerGoals=scorers.reduce((sum,s)=>sum+(Number(s.goals)||0),0);
+  const ownGoals=Math.max(0,Number(d.own_goals??d.scorer_audit?.own_goals??0)||0);
+  const expected=Math.max(0,Number(d.eschenbach?.goals_for)||0);
+  if(!playerGoals&&!ownGoals)return'';
+  if(expected&&playerGoals+ownGoals<expected)return'';
+  if(ownGoals===1)return`${playerGoals} Tore durch Eschenbacher Spieler · 1 Eigentor zugunsten von Eschenbach.`;
+  if(ownGoals>1)return`${playerGoals} Tore durch Eschenbacher Spieler · ${ownGoals} Eigentore zugunsten von Eschenbach.`;
+  return`${playerGoals} Tore durch Eschenbacher Spieler.`;
+}
+
 function render(d){
   const e=d.eschenbach||{};
   const fresh=freshnessInfo(d.generated_at);
+  const situation=readerText(d.current_situation);
+  const review=readerText(d.review);
+  const outlook=readerText(d.outlook);
+  const lead=readerText(d.lead);
+  const scorerInfo=scorerSummary(d);
   app.innerHTML=`
 <section class="team-photo-inline" id="teamPhotoCard">
   <img src="team-photo.jpg?v=3" alt="Mannschaft FC Eschenbach II" loading="eager" onerror="document.getElementById('teamPhotoCard').style.display='none'">
@@ -40,13 +70,13 @@ function render(d){
     <span class="update-sticker-icon" aria-hidden="true">↻</span>
     <div class="update-sticker-copy"><span>AKTUALISIERT AM</span><strong>${fresh.date}</strong>${fresh.time?`<small>${fresh.time}</small>`:''}</div>
   </div>
-  <span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(d.lead)}</p>
+  <span class="pill">FC ESCHENBACH II</span><h2 style="font-size:27px;margin-top:10px">${esc(d.title)}</h2><p class="lead">${esc(lead)}</p>
 </section>
 <section class="grid"><div class="stat"><strong>${esc(e.rank?`#${e.rank}`:'–')}</strong><span>Rang</span></div><div class="stat"><strong>${val(e.points)}</strong><span>Punkte</span></div><div class="stat"><strong>${val(e.wins)}</strong><span>Siege</span></div></section>
-<section class="card"><h2>Rückblick</h2><p>${esc(d.review)}</p>${(d.recent_results||[]).map(matchHTML).join('')}</section>
-<section class="card standings-card"><h2>Aktuelle Situation</h2><p>${esc(d.current_situation)}</p><div class="table-wrap"><table class="standings"><thead><tr><th>#</th><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Str</th><th>Tore</th><th>TD</th><th>Pkt</th></tr></thead><tbody>${(d.standings||[]).map(raw=>{const r=fullRow(raw);return`<tr class="${r.is_eschenbach?'fce':''}"><td>${val(r.rank)}</td><td>${esc(r.team)}</td><td>${val(r.played)}</td><td>${val(r.wins)}</td><td>${val(r.draws)}</td><td>${val(r.losses)}</td><td>${val(r.penalty_points)}</td><td>${r.goals_for!=null&&r.goals_against!=null?`${r.goals_for}:${r.goals_against}`:'–'}</td><td>${r.goal_difference!=null?`${r.goal_difference>0?'+':''}${r.goal_difference}`:'–'}</td><td><strong>${val(r.points)}</strong></td></tr>`}).join('')}</tbody></table></div><div class="table-legend">Sp = Spiele · S = Siege · U = Unentschieden · N = Niederlagen · Str = Strafpunkte · TD = Tordifferenz</div></section>
-<section class="card"><h2>Ausblick</h2><p>${esc(d.outlook)}</p><h3 class="section-subtitle">Kommende Spiele</h3>${(d.upcoming_matches||[]).map(matchHTML).join('')}</section>
-${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${d.scorers.map(s=>`<div class="match"><strong>${esc(s.name)}</strong> · ${esc(s.goals)} Tore</div>`).join('')}<div class="muted">${esc(d.scorer_note||'')}</div></section>`:''}`;
+<section class="card"><h2>Rückblick</h2><p>${esc(review)}</p>${(d.recent_results||[]).map(matchHTML).join('')}</section>
+<section class="card standings-card"><h2>Aktuelle Situation</h2><p>${esc(situation)}</p><div class="table-wrap"><table class="standings"><thead><tr><th>#</th><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Str</th><th>Tore</th><th>TD</th><th>Pkt</th></tr></thead><tbody>${(d.standings||[]).map(raw=>{const r=fullRow(raw);return`<tr class="${r.is_eschenbach?'fce':''}"><td>${val(r.rank)}</td><td>${esc(r.team)}</td><td>${val(r.played)}</td><td>${val(r.wins)}</td><td>${val(r.draws)}</td><td>${val(r.losses)}</td><td>${val(r.penalty_points)}</td><td>${r.goals_for!=null&&r.goals_against!=null?`${r.goals_for}:${r.goals_against}`:'–'}</td><td>${r.goal_difference!=null?`${r.goal_difference>0?'+':''}${r.goal_difference}`:'–'}</td><td><strong>${val(r.points)}</strong></td></tr>`}).join('')}</tbody></table></div><div class="table-legend">Sp = Spiele · S = Siege · U = Unentschieden · N = Niederlagen · Str = Strafpunkte · TD = Tordifferenz</div></section>
+<section class="card"><h2>Ausblick</h2><p>${esc(outlook)}</p><h3 class="section-subtitle">Kommende Spiele</h3>${(d.upcoming_matches||[]).map(matchHTML).join('')}</section>
+${d.scorers?.length?`<section class="card"><h2>Eschenbach-Torschützen</h2>${d.scorers.map(s=>`<div class="match"><strong>${esc(s.name)}</strong> · ${esc(s.goals)} Tore</div>`).join('')}${scorerInfo?`<div class="muted">${esc(scorerInfo)}</div>`:''}</section>`:''}`;
 }
 
 fetch('data/report.json?'+Date.now()).then(r=>{if(!r.ok)throw Error();return r.json()}).then(render).catch(()=>app.innerHTML='<section class="status-card">Der Tagesbericht konnte gerade nicht geladen werden.</section>');
@@ -62,4 +92,4 @@ logoButton?.addEventListener('click',openLogo);
 logoClose?.addEventListener('click',closeLogo);
 logoModal?.addEventListener('click',e=>{if(e.target===logoModal)closeLogo();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&logoModal&&!logoModal.hidden)closeLogo();});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=13').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=14').catch(()=>{})}
