@@ -14,12 +14,13 @@
     if(!id){id=makeUuid();localStorage.setItem(deviceKey,id)}
     return id;
   };
+  const isGoEschenbachHeading=el=>/^go\s+eschenbach(?:\s+ii)?$/i.test(el.textContent?.trim()||'');
   const collectHeadings=()=>{
     const list=[];
     const hero=document.querySelector('.hero h1');
     if(hero)list.push(hero);
     document.querySelectorAll('#app h2,#app h3.section-subtitle').forEach(el=>list.push(el));
-    return list.filter(el=>el.textContent?.trim());
+    return list.filter(el=>el.textContent?.trim()&&!isGoEschenbachHeading(el));
   };
   const sectionKey=heading=>`heading:${heading.textContent.trim()}`.slice(0,300);
   const savedKey=key=>`go-eschenbach-mood-choice:${key}`;
@@ -59,7 +60,7 @@
   }
 
   function mountHeading(heading){
-    if(heading.dataset.moodMeterMounted==='1')return;
+    if(isGoEschenbachHeading(heading)||heading.dataset.moodMeterMounted==='1')return;
     heading.dataset.moodMeterMounted='1';
     const key=sectionKey(heading);
     const selected=localStorage.getItem(savedKey(key))==='heart';
