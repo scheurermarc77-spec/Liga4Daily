@@ -2,7 +2,6 @@
   const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/scorer-hearts-public';
   const deviceKey='go-eschenbach-mood-device';
   const teamNeedle='fc eschenbach ii';
-  let report=null;
   let cycle=null;
   let rebuildTimer=null;
   let kickoffTimer=null;
@@ -28,22 +27,23 @@
     const dm=String(m?.date||'').match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
     const tm=String(m?.time||'').match(/^(\d{1,2}):(\d{2})$/);
     if(!dm||!tm)return null;
+    const hh=String(Number(tm[1])).padStart(2,'0');
+    const time=`${hh}:${tm[2]}`;
     const ts=new Date(Number(dm[3]),Number(dm[2])-1,Number(dm[1]),Number(tm[1]),Number(tm[2]),0,0).getTime();
     if(!Number.isFinite(ts))return null;
-    const key=`${m.date} ${String(m.time).padStart(5,'0')}|${String(m.home||'').trim()}|${String(m.away||'').trim()}`.slice(0,220);
-    return {ts,key};
+    return {ts,key:`eschenbach:${m.date} ${time}`.slice(0,220)};
   }
 
   function deriveCycle(d){
     const all=[...(Array.isArray(d?.recent_results)?d.recent_results:[]),...(Array.isArray(d?.upcoming_matches)?d.upcoming_matches:[])];
-    const matches=all.filter(isEschenbach).map(m=>({...m,...kickoffInfo(m)})).filter(m=>m.ts&&m.key);
+    const matches=all.filter(isEschenbach).map(m=>{
+      const info=kickoffInfo(m);
+      return info?{...m,...info}:null;
+    }).filter(Boolean);
     const now=Date.now();
     const started=matches.filter(m=>m.ts<=now).sort((a,b)=>b.ts-a.ts);
     const future=matches.filter(m=>m.ts>now).sort((a,b)=>a.ts-b.ts);
-    return {
-      key:started[0]?.key||'saisonstart',
-      nextAt:future[0]?.ts||null
-    };
+    return {key:started[0]?.key||'saisonstart',nextAt:future[0]?.ts||null};
   }
 
   function findScorerCard(){
@@ -58,8 +58,8 @@
 
   function setStatus(text){
     const card=findScorerCard();
-    let el=card?.querySelector('.scorer-hearts-status');
     if(!card)return;
+    let el=card.querySelector('.scorer-hearts-status');
     if(!el){
       el=document.createElement('div');
       el.className='scorer-hearts-status';
@@ -71,25 +71,32 @@
   }
 
   function mountRows(){
-    const rows=scorerRows();
-    if(!rows.length)return false;
-    rows.forEach(row=>{
+    let mounted=false;
+    scorerRows().forEach(row=>{
       if(row.dataset.scorerHeartMounted==='1')return;
       const name=row.querySelector('strong')?.textContent?.trim();
       if(!name)return;
       const key=playerKey(name);
       const content=[...row.children].find(el=>el.tagName==='DIV');
       if(!content)return;
+
       row.dataset.scorerHeartMounted='1';
       row.dataset.scorerKey=key;
       const wrap=document.createElement('div');
       wrap.className='scorer-heart-wrap';
-      wrap.innerHTML=`<button class="scorer-heart-button" type="button" data-player-key="${key}" data-player-name="${name.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}" aria-label="Volltreffer für ${name.replace(/"/g,'&quot;')}"><span class="scorer-heart-icon" aria-hidden="true">❤️</span><span class="scorer-heart-label">Volltreffer</span><span class="scorer-heart-count">0</span></button>`;
+      const button=document.createElement('button');
+      button.className='scorer-heart-button';
+      button.type='button';
+      button.dataset.playerKey=key;
+      button.setAttribute('aria-label',`Volltreffer für ${name}`);
+      button.innerHTML='<span class="scorer-heart-icon" aria-hidden="true">❤️</span><span class="scorer-heart-label">Volltreffer</span><span class="scorer-heart-count">0</span>';
+      button.addEventListener('click',()=>vote(name,key));
+      wrap.appendChild(button);
       content.appendChild(wrap);
-      wrap.querySelector('button')?.addEventListener('click',()=>vote(name,key));
+      mounted=true;
     });
     renderState();
-    return true;
+    return mounted;
   }
 
   function renderState(){
@@ -139,7 +146,6 @@
       if(!r.ok)throw Error();
       state.voted_player_key=key;
       state.counts[key]=(Number(state.counts[key])||0)+1;
-      renderState();
     }catch{
       setStatus('Volltreffer konnte nicht gespeichert werden.');
     }finally{
@@ -157,7 +163,8 @@
   }
 
   const rebuild=()=>{
-    if(mountRows())refreshState();
+    const mounted=mountRows();
+    if(mounted)refreshState();
   };
   const scheduleRebuild=()=>{clearTimeout(rebuildTimer);rebuildTimer=setTimeout(rebuild,60)};
 
@@ -165,14 +172,13 @@
     try{
       const r=await fetch(`data/report.json?scorerhearts=${Date.now()}`,{cache:'no-store'});
       if(!r.ok)throw Error();
-      report=await r.json();
-      cycle=deriveCycle(report);
+      cycle=deriveCycle(await r.json());
       scheduleNextKickoff();
     }catch{
       cycle={key:'saisonstart',nextAt:null};
     }
     rebuild();
     const app=document.getElementById('app');
-    if(app)new MutationObserver(scheduleRebuild).observe(app,{childList:true,subtree:true,characterData:true});
+    if(app)new MutationObserver(scheduleRebuild).observe(app,{childList:true,subtree:true});
   })();
 })();
