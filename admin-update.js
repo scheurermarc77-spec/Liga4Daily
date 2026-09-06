@@ -5,6 +5,7 @@
 
   const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request';
   let pollTimer=null;
+  let holdTimer=null;
   let requestedAt=null;
   let beforeGeneratedAt='';
 
@@ -25,6 +26,9 @@
 
   const stopPolling=()=>{
     if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+  };
+  const cancelHold=()=>{
+    if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}
   };
 
   const waitForPublishedReport=async()=>{
@@ -110,8 +114,16 @@
     }
   };
 
-  el.addEventListener('click',requestUpdate);
+  el.addEventListener('click',e=>e.preventDefault());
   el.addEventListener('contextmenu',e=>e.preventDefault());
+  el.addEventListener('pointerdown',()=>{
+    cancelHold();
+    if(el.disabled)return;
+    holdTimer=setTimeout(()=>{holdTimer=null;requestUpdate();},1200);
+  });
+  el.addEventListener('pointerup',cancelHold);
+  el.addEventListener('pointercancel',cancelHold);
+  el.addEventListener('pointerleave',cancelHold);
 
   (async()=>{
     try{
