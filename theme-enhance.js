@@ -11,6 +11,10 @@
       if(title==='Eschenbach-Torschützen')card.classList.add('section-card','scorers-card');
     });
 
+    document.querySelectorAll('#app .review-card .match,#app .outlook-card .match').forEach(row=>{
+      if(row.textContent.includes('FC Eschenbach II'))row.classList.add('eschenbach-match');
+    });
+
     const scorerCard=document.querySelector('#app .scorers-card');
     if(scorerCard){
       scorerCard.querySelectorAll('.match').forEach(row=>row.classList.add('scorer-row'));
@@ -34,5 +38,5 @@
     }
   }
 
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=18').catch(()=>{});}
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=19').catch(()=>{});}
 })();
