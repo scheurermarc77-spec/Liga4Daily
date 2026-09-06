@@ -11,7 +11,10 @@
     const headings=[];
     const heroTitle=document.querySelector('.hero h1');
     if(heroTitle)headings.push(heroTitle);
-    document.querySelectorAll('#app h2,#app h3.section-subtitle').forEach(el=>headings.push(el));
+    document.querySelectorAll('#app h2,#app h3.section-subtitle').forEach(el=>{
+      if(el.closest('.report-card'))return;
+      headings.push(el);
+    });
     return headings.filter(el=>el.textContent?.trim());
   };
 
