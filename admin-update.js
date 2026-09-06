@@ -1,20 +1,131 @@
 (()=>{
   const el=document.getElementById('bottomUpdate');
+  const statusEl=document.getElementById('bottomUpdateStatus');
   if(!el)return;
-  const url='https://github.com/go-eschenbach-ii/go-eschenbach-ii.github.io/actions/workflows/daily-report.yml';
-  let timer=null;
-  const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
-  const start=e=>{
-    cancel();
-    timer=setTimeout(()=>{
-      timer=null;
-      window.open(url,'_blank','noopener');
-    },1400);
+
+  const API='https://kfpxheegmeupnuzqjqqt.supabase.co/functions/v1/report-update-request';
+  let pollTimer=null;
+  let requestedAt=null;
+  let beforeGeneratedAt='';
+
+  const setStatus=(text,state='')=>{
+    if(!statusEl)return;
+    statusEl.textContent=text||'';
+    statusEl.dataset.state=state;
   };
-  el.addEventListener('click',e=>e.preventDefault());
+
+  const getReportVersion=async()=>{
+    try{
+      const r=await fetch(`data/report.json?updatecheck=${Date.now()}`,{cache:'no-store'});
+      if(!r.ok)return'';
+      const d=await r.json();
+      return String(d.generated_at||'');
+    }catch{return'';}
+  };
+
+  const stopPolling=()=>{
+    if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+  };
+
+  const waitForPublishedReport=async()=>{
+    setStatus('Bericht wird veröffentlicht …','publishing');
+    const started=Date.now();
+    while(Date.now()-started<120000){
+      await new Promise(r=>setTimeout(r,7000));
+      const current=await getReportVersion();
+      if(current && current!==beforeGeneratedAt){
+        setStatus('Aktualisiert ✓','done');
+        el.textContent='Aktualisiert';
+        setTimeout(()=>location.reload(),900);
+        return;
+      }
+    }
+    setStatus('Aktualisiert. App kurz neu öffnen.','done');
+    el.textContent='Update';
+    el.disabled=false;
+  };
+
+  const poll=async()=>{
+    stopPolling();
+    try{
+      const r=await fetch(`${API}?t=${Date.now()}`,{cache:'no-store'});
+      if(!r.ok)throw Error();
+      const d=await r.json();
+      if(d.pending){
+        setStatus('Aktualisierung läuft …','running');
+        pollTimer=setTimeout(poll,12000);
+        return;
+      }
+
+      const completedAt=d.completed_at?new Date(d.completed_at).getTime():0;
+      const failedAt=d.failed_at?new Date(d.failed_at).getTime():0;
+      const reqTime=requestedAt?new Date(requestedAt).getTime():0;
+      if(failedAt && (!reqTime||failedAt>=reqTime)){
+        setStatus('Aktualisierung fehlgeschlagen. Bitte nochmals versuchen.','error');
+        el.textContent='Update';
+        el.disabled=false;
+        return;
+      }
+      if(completedAt && (!reqTime||completedAt>=reqTime)){
+        await waitForPublishedReport();
+        return;
+      }
+      pollTimer=setTimeout(poll,12000);
+    }catch{
+      setStatus('Verbindung wird erneut geprüft …','running');
+      pollTimer=setTimeout(poll,15000);
+    }
+  };
+
+  const requestUpdate=async()=>{
+    if(el.disabled)return;
+    el.disabled=true;
+    el.textContent='Startet …';
+    setStatus('Update wird angefordert …','running');
+    beforeGeneratedAt=await getReportVersion();
+    try{
+      const r=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'request'})
+      });
+      const d=await r.json().catch(()=>({}));
+      if(r.status===429){
+        const mins=Math.max(1,Math.ceil(Number(d.cooldown_seconds||60)/60));
+        setStatus(`Bereits kürzlich aktualisiert. In ca. ${mins} Min. wieder möglich.`,'info');
+        el.textContent='Update';
+        el.disabled=false;
+        return;
+      }
+      if(!r.ok||!d.pending)throw Error();
+      requestedAt=d.requested_at||new Date().toISOString();
+      localStorage.setItem('go-eschenbach-last-update-request',requestedAt);
+      setStatus(d.already_pending?'Aktualisierung läuft bereits …':'Aktualisierung gestartet …','running');
+      el.textContent='Läuft …';
+      poll();
+    }catch{
+      setStatus('Update konnte nicht gestartet werden.','error');
+      el.textContent='Update';
+      el.disabled=false;
+    }
+  };
+
+  el.addEventListener('click',requestUpdate);
   el.addEventListener('contextmenu',e=>e.preventDefault());
-  el.addEventListener('pointerdown',start);
-  el.addEventListener('pointerup',cancel);
-  el.addEventListener('pointercancel',cancel);
-  el.addEventListener('pointerleave',cancel);
+
+  (async()=>{
+    try{
+      const r=await fetch(`${API}?t=${Date.now()}`,{cache:'no-store'});
+      if(!r.ok)return;
+      const d=await r.json();
+      if(d.pending){
+        beforeGeneratedAt=await getReportVersion();
+        requestedAt=d.requested_at||localStorage.getItem('go-eschenbach-last-update-request');
+        el.disabled=true;
+        el.textContent='Läuft …';
+        setStatus('Aktualisierung läuft …','running');
+        poll();
+      }
+    }catch{}
+  })();
 })();
